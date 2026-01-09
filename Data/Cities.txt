@@ -1,0 +1,132 @@
+Multan			Urban
+Faisalabad		Urban
+Sukkur			Urban
+Lahore			Urban
+Shaheed Benazirabad	Rural
+Gujranwala		Urban
+Karachi			Urban
+Kohat			Rural
+Jacobabad		Rural
+Rahim Yar Khan		Rural
+Quetta			Urban
+Bagh			Rural
+Islamabad		Urban
+Jamshoro		Rural
+Peshawar		Rural
+Mirpur Khas		Rural
+Hyderabad		Urban
+Bahawalpur		Rural
+Khairpur		Rural
+Badin			Rural
+Mianwali		Rural
+Okara			Rural
+Chakwal			Rural
+Sargodha		Rural
+Khanpur			Rural
+Ghotki			Rural
+Kabirwala		Rural
+Rawalpindi		Urban
+Jaranwala		Urban
+Chaman			Rural
+Hafizabad		Rural
+Sialkot			Urban
+Khanewal		Rural
+Larkana			Rural
+Mardan			Rural
+Shekhupura		Urban
+Rajanpur		Rural
+Sanghar			Rural
+Rahimyar Khan		Rural
+Tando Allahyar		Rural
+Sahiwal			Rural
+Jhelum			Urban
+Kashmore		Rural
+Shikarpur		Rural
+Matiari			Rural
+Chiniot			Urban
+Pattoki			Rural
+Wazirabad		Rural
+Umerkot			Rural			
+ShahdadKot		Rural
+Dera Ismail Khan	Rural		
+Dadu			Rural
+Bahawalnagar		Rural
+Muzaffargarh		Rural
+Swabi			Rural
+Gujrat			Urban
+Hangu			Rural
+Battagram		Rural	
+Kot Addu		Rural
+Lala Musa		Urban
+Kasur			Rural
+Lakki			Rural
+Khushab			Rural
+Muridke			Urban
+Thatta			Rural
+Lodhran			Rural
+Sibi			Rural
+Nowshera		Urban
+Bhakkar			Urban
+Pakpattan		Rural
+Toba Tek Singh		Urban
+Tando Muhammad Khan	Rural
+Abbottabad		Rural
+Dera Bugti		Rural
+Kotli			Urban
+Nawabshah		Urban
+Kamalia			Urban
+Dera Ghazi Khan		Rural
+Mansehra		Rural
+Mastung			Rural
+Kharian			Urban
+Malakand		Rural
+Gojra			Urban
+Charsadda		Rural
+Tank			Rural
+Upper Dir		Rural
+Muzaffarabad		Urban
+Hasilpur		Urban
+Mandi Bahauddin		Urban
+Narowal			Urban
+Leiah			Rural
+Zhob			Rural
+Kalat			Rural
+Karak			Rural
+Eidgah			Rural
+Qila Saifullah		Rural
+Pishin			Rural
+Kohlu			Rural
+Timergara		Rural
+Chitral			Rural
+Dera Murad Jamali	Rural
+Gwadar			Urban
+Bannu			Rural
+Jhang			Rural
+Khuzdar			Rural
+Loralai			Rural	
+Gilgit			Urban
+Hassan Abdal		Urban
+Mian Channu		Rural
+Kundian			Rural
+Kandhkot		Rural
+Barkhan			Rural
+Haripur			Rural
+Shakargarh		Rural
+Abdul Hakim		Rural
+Turbat			Urban
+Ziarat			Rural
+Nankana Sahib		Rural
+Kharan			Rural
+Alpurai			Rural
+Panjgur			Rural
+Saddiqabad		Urban
+Dalbandin		Rural
+Naushahro Firoz		Rural
+Parachinar		    Rural
+Vihari			Rural
+Awaran			Rural
+RawalaKot		Urban
+Gandava			Rural
+Aliabad			Rural
+Sujawal			Rural
+Hala            Rural
