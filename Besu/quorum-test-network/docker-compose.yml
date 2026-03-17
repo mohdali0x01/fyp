@@ -20,35 +20,38 @@ x-besu-def: &besu-def
       --rpc-ws-api=EEA,WEB3,ETH,NET,TRACE,DEBUG,ADMIN,TXPOOL,PERM,${BESU_CONS_ALGO:-QBFT} ;
 
 x-blockscout-ref: &blockscout-def
-  image: consensys/blockscout:v4.1.5-beta
+  image: blockscout/blockscout:latest
   container_name: blockscout
-  restart: "no"
-  environment:
-    - PORT=4000
-    - ECTO_USE_SSL=false
-    - DATABASE_URL=postgresql://postgres:postgres@blockscoutpostgres:5432/postgres?ssl=false
-    - POSTGRES_PASSWORD=postgres
-    - POSTGRES_USER=postgres
-    - NETWORK=quickstart
-    - NETWORK=Dev Quickstart
-    - SUBNETWORK=Quorum
-    - CHAIN_ID=1337
-    - COIN=ETH
-    - ETHEREUM_JSONRPC_VARIANT=besu
-    - ETHEREUM_JSONRPC_TRANSPORT=http
-    - ETHEREUM_JSONRPC_HTTP_URL=http://rpcnode:8545
-    - ETHEREUM_JSONRPC_TRACE_URL=http://rpcnode:8545
-    - ETHEREUM_JSONRPC_WS_URL=ws://rpcnode:8546
-  entrypoint:
+  restart: always
+  command:
     - /bin/sh
     - -c
     - |
-      cd /opt/app/;
-      echo $$MIX_ENV && mix do ecto.create, ecto.migrate; mix phx.server;
+      /app/bin/blockscout eval "Explorer.ReleaseTasks.create_and_migrate"
+      /app/bin/blockscout start
+  environment:
+    - PORT=4000
+    - ECTO_IPV6=false
+    - ECTO_USE_SSL=false
+    - DATABASE_URL=postgresql://postgres:postgres@blockscoutpostgres:5432/postgres?ssl=false&pool_size=50&queue_target=5000
+    - POSTGRES_PASSWORD=postgres
+    - POSTGRES_USER=postgres
+    - POOL_SIZE=50
+    - DISABLE_WEBAPP=false
+    - API_V2_ENABLED=true
+    - DATABASE_AUTO_MIGRATION=true
+    - SECRET_KEY_BASE=56j9+nkh6p9gh7mq9dq976mptm7dq9pxp686p6sqcm9dq9dq9dq9dq9dq9dq9dq9
+    - DATABASE_READ_ONLY=false
+    - NETWORK=Dev Quickstart
+    - CHAIN_ID=1337
+    - COIN=ETH
+    - ETHEREUM_JSONRPC_VARIANT=besu
+    - ETHEREUM_JSONRPC_HTTP_URL=http://rpcnode:8545
+    - ETHEREUM_JSONRPC_WS_URL=ws://rpcnode:8546
+    - INDEXER_DISABLE_PENDING_TRANSACTIONS_FETCHER=TRUE
   depends_on:
-    - blockscoutpostgres
-  links:
-    - blockscoutpostgres
+    blockscoutpostgres:
+      condition: service_healthy
   ports:
     - 26000:4000
 
