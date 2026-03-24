@@ -216,6 +216,22 @@ services:
       quorum-dev-quickstart:
         ipv4_address: 172.16.239.52
 
+  app-postgres:
+    image: postgres:15-alpine
+    restart: "on-failure"
+    container_name: app-postgres
+    environment:
+      - POSTGRES_USER=appuser
+      - POSTGRES_PASSWORD=apppassword
+      - POSTGRES_DB=appdb
+    volumes:
+      - app-postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      quorum-dev-quickstart:
+        ipv4_address: 172.16.239.55
+
   prometheus:
     image: "prom/prometheus:v2.46.0"
     volumes:
@@ -271,6 +287,7 @@ volumes:
   splunk:
   ethlogger:
   blockscoutpostgres:
+  app-postgres-data:
 networks:
   quorum-dev-quickstart:
     name: quorum-dev-quickstart
