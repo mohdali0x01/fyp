@@ -16,4 +16,24 @@ Desktop.ini
 # Temp
 tmp/
 temp/
-node_modules/
+**/node_modules/
+
+# Secrets and Env Vars
+.env
+.env.*
+!.env.example
+
+# Build and Artifacts
+.next/
+Besu/quorum-test-network/smart_contracts/artifacts/
+Besu/quorum-test-network/smart_contracts/cache/
+
+# Backups
+*.bak
+
+# Personal Scratchpads & Prototypes
+AidLedger_Context.md
+context.md
+JURY_DEMO_CHEATSHEET.md
+jury_dashboard.html
+backend/scratch/
