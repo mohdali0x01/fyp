@@ -1,0 +1,146 @@
+{% extends "dashboard/_layout.html" %}
+
+{% block title %}درخواست — Apply for Aid{% endblock %}
+{% block page_title %}Apply for Aid{% endblock %}
+
+{% block dashboard_content %}
+<div class="max-w-2xl mx-auto">
+
+  {# Page heading — stacked bilingual #}
+  <div class="mb-6">
+    <div class="bilingual-label mb-1">
+      <h1 class="text-2xl font-bold text-slate-100">Submit Aid Application</h1>
+      <span class="urdu-sm text-emerald-400/80">درخواست جمع کروائیں</span>
+    </div>
+    <p class="text-sm text-slate-500">
+      Fill in your details. Our system verifies your eligibility automatically within seconds.
+    </p>
+    <p class="urdu-sm text-slate-500 mt-0.5">
+      اپنی معلومات درج کریں — ہمارا نظام چند سیکنڈ میں اہلیت جانچ لے گا۔
+    </p>
+  </div>
+
+  {# Info banner — bilingual #}
+  <div class="glass-card p-4 mb-6 flex items-start gap-3 border border-emerald-500/20">
+    {{ icon('shield-check', 'w-4 h-4 text-emerald-400 shrink-0 mt-1') }}
+    <div>
+      <p class="text-sm text-slate-300 font-medium mb-0.5">5-Stage Automatic Verification</p>
+      <p class="text-xs text-slate-500">Identity · Family · Financial Assessment · Decision · Card Issuance — all within seconds, no human review required.</p>
+      <p class="urdu-xs text-slate-500 mt-1">شناخت · خاندان · مالی جائزہ · فیصلہ · کارڈ — سب خودکار، کوئی رشوت نہیں۔</p>
+    </div>
+  </div>
+
+  <div class="static-card p-6 sm:p-8">
+    <div id="form-error" class="mb-4"></div>
+
+    <form hx-post="/dashboard/apply"
+          hx-target="#form-error"
+          hx-swap="innerHTML"
+          class="space-y-5">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+
+      {# Full Name #}
+      <div class="bg-slate-900/40 p-5 rounded-2xl border border-slate-800/60 transition-all hover:border-emerald-500/30 group">
+        <label for="full_name" class="bilingual-label form-label mb-2 group-focus-within:text-emerald-400 transition-colors">
+          <span class="text-sm font-bold">Full Name</span>
+          <span class="urdu-xs text-slate-500 font-normal">مکمل نام</span>
+        </label>
+        <input id="full_name" name="full_name" type="text" required
+          autocomplete="name"
+          placeholder="e.g. Muhammad Ali Khan"
+          class="form-input bg-slate-950/50" />
+        <div class="bilingual-label mt-2">
+          <p class="text-[11px] text-slate-500">As written on your CNIC</p>
+          <p class="urdu-xs text-slate-600">جیسا شناختی کارڈ پر لکھا ہے</p>
+        </div>
+      </div>
+ 
+      {# CNIC #}
+      <div class="bg-slate-900/40 p-5 rounded-2xl border border-slate-800/60 transition-all hover:border-emerald-500/30 group">
+        <label for="cnic" class="bilingual-label form-label mb-2 group-focus-within:text-emerald-400 transition-colors">
+          <span class="text-sm font-bold">CNIC Number</span>
+          <span class="urdu-xs text-slate-500 font-normal">شناختی کارڈ نمبر</span>
+        </label>
+        <input id="cnic" name="cnic" type="text" required
+          placeholder="e.g. 42201-1234567-1"
+          class="form-input font-mono bg-slate-950/50"
+          maxlength="15" />
+        <div class="bilingual-label mt-2">
+          <p class="text-[11px] text-slate-500">13-digit number on your CNIC</p>
+          <p class="urdu-xs text-slate-600">شناختی کارڈ پر 13 ہندسوں کا نمبر</p>
+        </div>
+      </div>
+ 
+      {# Address #}
+      <div class="bg-slate-900/40 p-5 rounded-2xl border border-slate-800/60 transition-all hover:border-emerald-500/30 group">
+        <label for="address" class="bilingual-label form-label mb-2 group-focus-within:text-emerald-400 transition-colors">
+          <span class="text-sm font-bold">Home Address</span>
+          <span class="urdu-xs text-slate-500 font-normal">گھر کا پتہ</span>
+        </label>
+        <textarea id="address" name="address" required
+          rows="3"
+          placeholder="e.g. House 12, Street 4, North Nazimabad, Karachi"
+          class="form-input resize-none bg-slate-950/50"></textarea>
+        <div class="bilingual-label mt-2">
+          <p class="text-[11px] text-slate-500">Your complete home address</p>
+          <p class="urdu-xs text-slate-600">اپنے گھر کا مکمل پتہ لکھیں</p>
+        </div>
+      </div>
+ 
+      {# City #}
+      <div class="bg-slate-900/40 p-5 rounded-2xl border border-slate-800/60 transition-all hover:border-emerald-500/30 group">
+        <label for="city" class="bilingual-label form-label mb-2 group-focus-within:text-emerald-400 transition-colors">
+          <span class="text-sm font-bold">City / District</span>
+          <span class="urdu-xs text-slate-500 font-normal">شہر / ضلع</span>
+        </label>
+        <input id="city" name="city" type="text" required
+          placeholder="e.g. Karachi"
+          class="form-input bg-slate-950/50" />
+        <div class="bilingual-label mt-2">
+          <p class="text-[11px] text-slate-500">Your city or nearest town</p>
+          <p class="urdu-xs text-slate-600">آپ کا شہر یا قریبی قصبہ</p>
+        </div>
+      </div>
+
+      {# Criteria box — clean bilingual bullets #}
+      <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4">
+        <div class="bilingual-label mb-3">
+          <p class="text-xs font-semibold text-slate-300">How Eligibility Is Decided</p>
+          <p class="urdu-xs text-emerald-500/80">اہلیت کیسے جانچی جاتی ہے؟</p>
+        </div>
+        <ul class="space-y-3">
+          {% for en, ur in [
+            ('Your CNIC is checked against NADRA records',
+             'آپ کا شناختی کارڈ نادرا کے ریکارڈ سے ملایا جائے گا'),
+            ('Only one person per household can apply',
+             'ایک گھر سے صرف ایک فرد درخواست دے سکتا ہے'),
+            ('Your income is assessed using the government formula',
+             'آپ کی آمدنی سرکاری طریقے سے جانچی جائے گی'),
+            ('The decision is recorded permanently — no changes possible',
+             'فیصلہ مستقل طور پر محفوظ ہو گا — کوئی ردوبدل ممکن نہیں')
+          ] %}
+          <li class="flex items-start gap-2.5">
+            {{ icon('check','w-3 h-3 text-emerald-500 mt-1 shrink-0') }}
+            <div class="flex-1 min-w-0">
+              <div class="bilingual-label">
+                <span class="text-xs text-slate-400">{{ en }}</span>
+                <span class="urdu-xs text-slate-600 text-right">{{ ur }}</span>
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      {# Submit button — clean, no inline Urdu inside button #}
+      <div>
+        <button type="submit" class="btn-primary">
+          {{ icon('shield-check', 'w-4 h-4') }}
+          Submit Application
+        </button>
+        <p class="urdu-xs text-slate-600 text-center mt-2">درخواست جمع کریں اور تصدیق شروع کریں</p>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

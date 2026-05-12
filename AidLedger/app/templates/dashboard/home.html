@@ -1,0 +1,161 @@
+{% extends "dashboard/_layout.html" %}
+
+{% block title %}ڈیش بورڈ — Dashboard{% endblock %}
+{% block page_title %}Overview{% endblock %}
+
+{% block dashboard_content %}
+<div class="max-w-4xl mx-auto space-y-6">
+
+  {# Welcome header — bilingual #}
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div>
+      <div class="bilingual-label mb-1">
+        <h1 class="text-2xl font-bold text-slate-100">
+          Welcome back, <span class="gradient-text">{{ registration.full_name if registration and registration.full_name else username }}</span>
+        </h1>
+        <span class="urdu-sm text-slate-500">
+          {% if registration %}آپ کی درخواست{% else %}ابھی درخواست دیں{% endif %}
+        </span>
+      </div>
+      <p class="text-sm text-slate-500">
+        {% if registration %}Here's your aid application status.{% else %}You haven't submitted an application yet.{% endif %}
+      </p>
+    </div>
+    {% if not registration %}
+    <div>
+      <a href="/dashboard/apply"
+         class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold text-sm transition-all hover:shadow-lg hover:shadow-emerald-500/25 shrink-0">
+        {{ icon('file', 'w-4 h-4') }} Apply Now {{ icon('arrow-right', 'w-3.5 h-3.5') }}
+      </a>
+      <p class="urdu-xs text-slate-600 text-center mt-1">درخواست دیں</p>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if not registration %}
+  {# No application — bilingual empty state #}
+  <div class="glass-card p-10 text-center">
+    <div class="w-16 h-16 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center mx-auto mb-4">
+      {{ icon('file', 'w-8 h-8 text-slate-600') }}
+    </div>
+    <h3 class="text-lg font-semibold text-slate-300 mb-1">No Application Found</h3>
+    <p class="urdu-text text-emerald-400/80 text-base mb-2" dir="rtl">کوئی درخواست موجود نہیں</p>
+    <p class="text-sm text-slate-500 mb-2 max-w-sm mx-auto">
+      You haven't submitted an aid application yet. Our automated system determines your eligibility within seconds.
+    </p>
+    <p class="urdu-text text-slate-500 text-sm mb-6 max-w-sm mx-auto" dir="rtl">
+      امداد کے لیے درخواست دیں — ہمارا نظام چند سیکنڈ میں آپ کی اہلیت جانچ لے گا۔
+    </p>
+    <a href="/dashboard/apply"
+       class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold text-sm transition-all hover:shadow-xl hover:shadow-emerald-500/25">
+      {{ icon('file', 'w-4 h-4') }}
+      Submit Application
+      <span class="urdu-text text-xs">(درخواست جمع کروائیں)</span>
+    </a>
+  </div>
+
+  {% else %}
+  {# Application found — Quick stats #}
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    <div class="glass-card p-4 col-span-2 sm:col-span-1">
+      <div class="text-xs text-slate-500 mb-1">Status <span class="urdu-text">(درجہ)</span></div>
+      {% set s = registration.pipeline_status %}
+      {% if s == 'ELIGIBLE' %}
+        <span class="badge-eligible">{{ icon('check-circle','w-3.5 h-3.5') }} Eligible</span>
+        <p class="urdu-text text-xs text-emerald-400 mt-1" dir="rtl">اہل ہیں</p>
+      {% elif s == 'PENDING' %}
+        <span class="badge-pending">{{ icon('clock','w-3.5 h-3.5') }} Pending</span>
+        <p class="urdu-text text-xs text-amber-400 mt-1" dir="rtl">زیر جائزہ</p>
+      {% else %}
+        <span class="badge-failed">{{ icon('x-circle','w-3.5 h-3.5') }} Not Eligible</span>
+        <p class="urdu-text text-xs text-red-400 mt-1" dir="rtl">اہل نہیں</p>
+      {% endif %}
+    </div>
+    <div class="glass-card p-4">
+      <div class="text-xs text-slate-500 mb-1">Ref. <span class="urdu-text">(نمبر)</span></div>
+      <div class="font-mono font-bold text-slate-200 text-sm">AID-{{ '%05d'|format(registration.registration_id) }}</div>
+    </div>
+    <div class="glass-card p-4">
+      <div class="text-xs text-slate-500 mb-1">City <span class="urdu-text">(شہر)</span></div>
+      <div class="font-semibold text-slate-200 text-sm flex items-center gap-1">
+        {{ icon('send','w-3 h-3 text-emerald-400') }}
+        {{ registration.city or '—' }}
+      </div>
+    </div>
+    <div class="glass-card p-4">
+      <div class="text-xs text-slate-500 mb-1">Applied <span class="urdu-text">(تاریخ)</span></div>
+      <div class="text-slate-300 text-xs">
+        {% if registration.created_at %}{{ registration.created_at.strftime('%d %b %Y') }}{% else %}—{% endif %}
+      </div>
+    </div>
+  </div>
+
+  {# Pipeline tracker #}
+  <div class="glass-card p-6">
+    <h3 class="font-semibold text-slate-200 mb-1 flex items-center gap-2">
+      {{ icon('shield-check','w-4 h-4 text-emerald-400') }} Verification Progress
+    </h3>
+    <p class="urdu-text text-xs text-slate-500 mb-5" dir="rtl">تصدیق کا مرحلہ وار عمل</p>
+    {% include "partials/pipeline_tracker.html" %}
+  </div>
+
+  {# Status description — bilingual #}
+  {% set s = registration.pipeline_status %}
+  {% set status_info = {
+    'PENDING':           ('clock',        'amber',   'Under Review',           'Your application is in the verification queue.',
+                                                     'آپ کی درخواست جائزے میں ہے، چند لمحے انتظار کریں۔'),
+    'KYC_FAILED':        ('x-circle',     'red',     'Identity Check Failed',  'Your CNIC was not found in records. Contact support.',
+                                                     'آپ کا شناختی کارڈ نظام میں نہیں ملا۔ مدد کے لیے ہیلپ لائن پر رابطہ کریں۔'),
+    'FAMILY_INELIGIBLE': ('users',        'red',     'Family Already on Aid',  'A family member is already receiving assistance.',
+                                                     'آپ کے گھر کا کوئی فرد پہلے سے امداد وصول کر رہا ہے۔'),
+    'PMT_FAILED':        ('x-circle',     'red',     'Not Eligible at This Time','Your assessment score did not meet the criteria.',
+                                                     'آپ کی معاشی صورتحال ابھی مقررہ معیار پر پوری نہیں اترتی۔'),
+    'ELIGIBLE':          ('check-circle', 'emerald', 'Eligible for Aid',       'Congratulations! You passed all verification stages.',
+                                                     'مبارک ہو! آپ سرکاری امداد کے اہل قرار پائے ہیں۔'),
+  } %}
+  {% set info = status_info.get(s, ('alert','slate','Status Unknown','Please check back later.','براہ کرم بعد میں دوبارہ چیک کریں۔')) %}
+
+  <div class="glass-card p-5 border border-{{ info[1] }}-500/25">
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-{{ info[1] }}-500/15">
+        {{ icon(info[0], 'w-5 h-5 text-' + info[1] + '-400') }}
+      </div>
+      <div>
+        <div class="font-semibold text-slate-200 text-sm mb-0.5">{{ info[2] }}</div>
+        <p class="urdu-text text-{{ info[1] }}-400 text-sm mb-1" dir="rtl">{{ info[4] }}</p>
+        <p class="text-xs text-slate-500">{{ info[3] }}</p>
+      </div>
+    </div>
+    {# Latest Urdu notification #}
+    {% if registration.notifications and registration.notifications|length > 0 %}
+    <div class="mt-4 pt-4 border-t border-slate-800/60">
+      <p class="text-xs text-slate-600 mb-2">آخری اطلاع</p>
+      <p class="urdu-text text-slate-300" dir="rtl">{{ registration.notifications[0].message_text_urdu.split(' | ')[0] }}</p>
+    </div>
+    {% endif %}
+  </div>
+
+  {# Quick links — bilingual labels #}
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    {% for label, urdu_label, href, icon_name in [
+      ('View Full Status',  'مکمل درجہ دیکھیں',   '/dashboard/status',        'shield-check'),
+      ('Notifications',     'اطلاعات',              '/dashboard/notifications', 'bell'),
+      ('My Aid Card',       'میرا امدادی کارڈ',    '/dashboard/card',          'card'),
+    ] %}
+    <a href="{{ href }}"
+       class="glass-card p-4 flex items-center justify-between group hover:-translate-y-0.5 transition-all">
+      <div class="flex items-center gap-3">
+        {{ icon(icon_name, 'w-4 h-4 text-slate-500 group-hover:text-emerald-400 transition-colors') }}
+        <div>
+          <div class="text-sm text-slate-400 group-hover:text-slate-200 transition-colors">{{ label }}</div>
+          <div class="urdu-xs text-slate-600 group-hover:text-emerald-600 transition-colors">{{ urdu_label }}</div>
+        </div>
+      </div>
+      {{ icon('chevron-right', 'w-4 h-4 text-slate-700 group-hover:text-emerald-400 transition-colors') }}
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

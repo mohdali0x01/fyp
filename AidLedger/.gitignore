@@ -1,0 +1,22 @@
+# Python virtual environment
+venv/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Environment variables — NEVER commit this
+.env
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+
+# Prisma generated client (regenerated via: prisma generate)
+# The Python client is installed inside venv so no separate output directory needed
+
+# Runtime outputs
+LATEST_OTP.txt

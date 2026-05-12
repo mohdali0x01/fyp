@@ -1,0 +1,166 @@
+{% extends "admin/_layout.html" %}
+
+{% set portal_title = "Bank Portal" %}
+{% set portal_color = "amber" %}
+{% set portal_icon  = "card" %}
+
+{% block title %}Bank — Card Issuance Portal{% endblock %}
+{% block page_title %}Card Issuance{% endblock %}
+
+{% block sidebar_nav %}
+<div class="px-3">
+  <p class="text-xs text-slate-600 uppercase tracking-wider font-semibold px-2 mb-2">Cards</p>
+  <a href="/bank" class="sidebar-link">{{ icon('dashboard','w-4 h-4') }} Overview</a>
+  <a href="/bank/issue" class="sidebar-link">{{ icon('card','w-4 h-4') }} Awaiting Activation</a>
+  <a href="/bank/active" class="sidebar-link">{{ icon('check-circle','w-4 h-4') }} Active Cards</a>
+</div>
+{% endblock %}
+
+{% block portal_content %}
+<div class="max-w-5xl mx-auto space-y-6">
+
+  <div>
+    <h1 class="text-2xl font-bold text-slate-100">
+      {% if request.path == '/bank/issue' %}Cards Awaiting Activation
+      {% elif request.path == '/bank/active' %}Active Cards
+      {% else %}Card Management Portal{% endif %}
+    </h1>
+    <p class="text-sm text-slate-500 mt-1">
+      {% if request.path == '/bank/issue' %}Cards auto-issued and waiting for beneficiaries to tap.
+      {% elif request.path == '/bank/active' %}Cards currently active and in use.
+      {% else %}View active and pending cards across the network.{% endif %}
+    </p>
+  </div>
+
+  {% if request.path == '/bank' %}
+  {# Summary #}
+  <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+    <div class="glass-card p-5 text-center cursor-pointer hover:border-amber-500/30 transition-all" onclick="window.location='/bank/issue'">
+      <div class="text-3xl font-extrabold text-amber-400">{{ card_queue|length }}</div>
+      <div class="text-xs text-slate-500 mt-1">Awaiting Activation</div>
+    </div>
+    <div class="glass-card p-5 text-center cursor-pointer hover:border-emerald-500/30 transition-all" onclick="window.location='/bank/active'">
+      <div class="text-3xl font-extrabold text-emerald-400">{{ active_cards|length }}</div>
+      <div class="text-xs text-slate-500 mt-1">Active Cards</div>
+    </div>
+    <div class="glass-card p-5 text-center col-span-2 sm:col-span-1">
+      <div class="text-3xl font-extrabold text-blue-400">{{ (active_cards|length + card_queue|length) }}</div>
+      <div class="text-xs text-slate-500 mt-1">Total Beneficiaries</div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if request.path in ['/bank', '/bank/issue'] %}
+  {# Cards Awaiting Activation #}
+  <div class="glass-card p-6">
+    <h2 class="font-semibold text-slate-200 mb-4 flex items-center gap-2">
+      {{ icon('card','w-4 h-4 text-amber-400') }} Awaiting Activation
+      {% if card_queue %}
+      <span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/20">{{ card_queue|length }} waiting</span>
+      {% endif %}
+    </h2>
+    {% if request.path == '/bank/issue' %}
+    <p class="text-xs text-slate-500 mb-4">These cards have been auto-issued and are waiting for the beneficiary to physically scan and link them.</p>
+    {% endif %}
+    {% if card_queue %}
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-xs text-slate-500 border-b border-slate-800/60">
+            <th class="text-left py-2 pr-4 font-medium">Ref.</th>
+            <th class="text-left py-2 pr-4 font-medium">Eligible ID</th>
+            <th class="text-left py-2 pr-4 font-medium">City</th>
+            <th class="text-left py-2 pr-4 font-medium">Approved</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800/40">
+          {% for e in (card_queue[:5] if request.path == '/bank' else card_queue) %}
+          <tr class="hover:bg-slate-800/20 transition-colors">
+            <td class="py-2.5 pr-4 font-mono text-xs text-slate-400">
+              AID-{{ '%05d'|format(e.registration.registration_id) if e.registration else '—' }}
+            </td>
+            <td class="py-2.5 pr-4 font-mono text-xs text-slate-400">#{{ e.eligible_id }}</td>
+            <td class="py-2.5 pr-4 text-slate-400 text-xs">{{ e.registration.city if e.registration else '—' }}</td>
+            <td class="py-2.5 pr-4 text-xs text-slate-500">
+              {% if e.approved_at %}{{ e.approved_at.strftime('%d %b %Y') }}{% else %}—{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if request.path == '/bank' and card_queue|length > 5 %}
+    <div class="mt-4 text-center">
+      <a href="/bank/issue" class="text-xs text-amber-500 hover:text-amber-400">View all {{ card_queue|length }} pending {{ icon('chevron-right','w-3 h-3 inline-block') }}</a>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="text-center py-8">
+      <div class="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-3">
+        {{ icon('check-circle','w-6 h-6 text-emerald-400') }}
+      </div>
+      <p class="text-sm text-slate-400">All eligible applicants have active cards!</p>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if request.path in ['/bank', '/bank/active'] %}
+  {# Active Cards #}
+  <div class="glass-card p-6">
+    <h2 class="font-semibold text-slate-200 mb-4 flex items-center gap-2">
+      {{ icon('check-circle','w-4 h-4 text-emerald-400') }} Active Cards
+    </h2>
+    {% if active_cards %}
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-xs text-slate-500 border-b border-slate-800/60">
+            <th class="text-left py-2 pr-4 font-medium">Card Number</th>
+            <th class="text-left py-2 pr-4 font-medium">Ref.</th>
+            <th class="text-left py-2 pr-4 font-medium">City</th>
+            <th class="text-left py-2 pr-4 font-medium">Issued</th>
+            <th class="text-left py-2 pr-4 font-medium">Expires</th>
+            <th class="text-left py-2 font-medium">Transactions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800/40">
+          {% for c in (active_cards[:5] if request.path == '/bank' else active_cards) %}
+          <tr class="hover:bg-slate-800/20 transition-colors">
+            <td class="py-2.5 pr-4 font-mono text-xs text-emerald-400">
+              ****&nbsp;****&nbsp;****&nbsp;{{ c.virtual_card_number[-4:] }}
+            </td>
+            <td class="py-2.5 pr-4 font-mono text-xs text-slate-400">
+              AID-{{ '%05d'|format(c.registration.registration_id) if c.registration else '—' }}
+            </td>
+            <td class="py-2.5 pr-4 text-xs text-slate-400">{{ c.registration.city if c.registration else '—' }}</td>
+            <td class="py-2.5 pr-4 text-xs text-slate-500">
+              {% if c.issue_date %}{{ c.issue_date.strftime('%d %b %Y') }}{% else %}—{% endif %}
+            </td>
+            <td class="py-2.5 pr-4 text-xs text-slate-500">
+              {% if c.expiry_date %}{{ c.expiry_date.strftime('%d %b %Y') }}{% else %}—{% endif %}
+            </td>
+            <td class="py-2.5 text-xs text-slate-400">{{ c.transactions|length if c.transactions else 0 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if request.path == '/bank' and active_cards|length > 5 %}
+    <div class="mt-4 text-center">
+      <a href="/bank/active" class="text-xs text-emerald-500 hover:text-emerald-400">View all {{ active_cards|length }} active cards {{ icon('chevron-right','w-3 h-3 inline-block') }}</a>
+    </div>
+    {% endif %}
+    {% else %}
+    <p class="text-sm text-slate-500 text-center py-4">No active cards yet.</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 text-xs notice-text-amber flex items-start gap-2">
+    {{ icon('alert','w-4 h-4 shrink-0 mt-0.5') }}
+    Card numbers are partially masked for security. Full card numbers are only available through the secure card management terminal at your branch.
+  </div>
+
+</div>
+{% endblock %}

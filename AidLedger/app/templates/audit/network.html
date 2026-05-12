@@ -1,0 +1,22 @@
+{% extends "admin/_layout.html" %}
+{% set portal_title = "Audit Portal" %}
+{% set portal_color = "purple" %}
+{% set portal_icon  = "eye" %}
+{% block title %}Blockchain Network — Audit Portal{% endblock %}
+{% block page_title %}Blockchain Network{% endblock %}
+{% block sidebar_nav %}
+<div class="px-3">
+  <p class="text-xs text-slate-600 uppercase tracking-wider font-semibold px-2 mb-2">Audit</p>
+  <a href="/audit" class="sidebar-link">{{ icon('dashboard','w-4 h-4') }} Summary</a>
+  <a href="/audit/records" class="sidebar-link">{{ icon('file','w-4 h-4') }} All Records</a>
+  <a href="/audit/network" class="sidebar-link">{{ icon('network','w-4 h-4') }} Blockchain Network</a>
+</div>
+<div class="px-3 mt-4">
+  <div class="px-2 py-2 rounded-lg bg-purple-500/8 border border-purple-500/15 text-xs text-purple-400/70">
+    {{ icon('eye','w-3.5 h-3.5') }} Read-only access.
+  </div>
+</div>
+{% endblock %}
+{% block portal_content %}
+{% include "partials/network_content.html" %}
+{% endblock %}

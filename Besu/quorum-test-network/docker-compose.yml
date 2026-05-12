@@ -216,6 +216,27 @@ services:
       quorum-dev-quickstart:
         ipv4_address: 172.16.239.52
 
+  blockscout-frontend:
+    image: ghcr.io/blockscout/frontend:latest
+    container_name: blockscout-frontend
+    restart: always
+    environment:
+      - PORT=3000
+      - NEXT_PUBLIC_API_WEBSOCKET_PROTOCOL=ws
+      - NEXT_PUBLIC_API_PROTOCOL=http
+      - NEXT_PUBLIC_API_HOST=localhost:26000
+      - NEXT_PUBLIC_APP_PROTOCOL=http
+      - NEXT_PUBLIC_APP_HOST=localhost:3001
+      - NEXT_PUBLIC_NETWORK_NAME=Dev Quickstart
+      - NEXT_PUBLIC_NETWORK_ID=1337
+    ports:
+      - 3001:3000
+    depends_on:
+      - blockscout
+    networks:
+      quorum-dev-quickstart:
+        ipv4_address: 172.16.239.53
+
   app-postgres:
     image: postgres:15-alpine
     restart: "on-failure"

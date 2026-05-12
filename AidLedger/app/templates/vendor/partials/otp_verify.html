@@ -1,0 +1,69 @@
+{# vendor/partials/otp_verify.html — Shown after card tap, vendor enters OTP #}
+<div class="space-y-4">
+  <div class="p-4 rounded-xl bg-amber-500/8 border border-amber-500/20 text-center">
+    <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto mb-2">
+      <svg class="w-5 h-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+    </div>
+    <p class="font-semibold text-amber-500 text-sm">Card Detected — OTP Sent</p>
+    <p class="text-xs text-muted mt-1">
+      A secure 6-digit dynamic authorization code has been dispatched to the registered customer's mobile device
+      (Phone ending in <strong class="text-secondary">****{{ phone_tail }}</strong>).
+    </p>
+    <p class="text-xs text-muted mt-1">
+      Charging: <strong class="text-amber-500">PKR {{ "{:,}".format(amount) }}</strong> to
+      <strong class="text-secondary">{{ cardholder }}</strong>
+    </p>
+    <p class="text-xs text-muted mt-1 font-medium italic">Code expires in {{ expiry_minutes }} minutes.</p>
+  </div>
+
+  <form
+    id="otp-form"
+    hx-post="/vendor/verify-otp"
+    hx-target="#checkout-zone"
+    hx-swap="innerHTML"
+    hx-indicator="#otp-spinner"
+    class="space-y-4"
+  >
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+
+    <div class="otp-box p-4 rounded-2xl focus-within:border-amber-500/40 transition-all">
+      <label for="otp-input" class="block text-xs font-semibold text-muted mb-2 uppercase tracking-wider">
+        Enter OTP Code (from customer)
+      </label>
+      <input
+        id="otp-input"
+        name="otp"
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]{6}"
+        maxlength="6"
+        required
+        autocomplete="off"
+        placeholder="123456"
+        class="otp-input bg-transparent border-none outline-none w-full text-center text-3xl font-extrabold tracking-[0.75rem]"
+        autofocus
+      />
+    </div>
+
+    <button type="submit" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold text-sm transition-all flex items-center justify-center gap-2">
+      <div id="otp-spinner" class="htmx-indicator w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+      Verify &amp; Complete Payment
+    </button>
+  </form>
+
+  <button
+    onclick="location.reload()"
+    class="w-full py-2 rounded-xl text-muted hover:text-primary text-xs transition-colors flex items-center justify-center gap-1.5"
+  >
+    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+    </svg>
+    Cancel &amp; start over
+  </button>
+</div>

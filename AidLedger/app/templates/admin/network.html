@@ -1,0 +1,18 @@
+{% extends "admin/_layout.html" %}
+{% set portal_title = "AidLedger Admin" %}
+{% set portal_color = "emerald" %}
+{% set portal_icon  = "shield-check" %}
+{% block title %}Blockchain Network — AidLedger Admin{% endblock %}
+{% block page_title %}Blockchain Network{% endblock %}
+{% block sidebar_nav %}
+<div class="px-3">
+  <p class="text-xs text-slate-600 uppercase tracking-wider font-semibold px-2 mb-2">Management</p>
+  <a href="/admin" class="sidebar-link">{{ icon('dashboard','w-4 h-4') }} Overview</a>
+  <a href="/admin/registrations" class="sidebar-link">{{ icon('users','w-4 h-4') }} All Applications</a>
+  <a href="/admin/policies" class="sidebar-link">{{ icon('layers','w-4 h-4') }} Policies</a>
+  <a href="/admin/network" class="sidebar-link">{{ icon('network','w-4 h-4') }} Blockchain Network</a>
+</div>
+{% endblock %}
+{% block portal_content %}
+{% include "partials/network_content.html" %}
+{% endblock %}

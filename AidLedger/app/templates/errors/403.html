@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}403 Forbidden{% endblock %}
+{% block body %}
+<div class="hero-gradient grid-bg min-h-screen flex items-center justify-center px-4">
+  <div class="text-center animate-slide-up max-w-md">
+    <div class="w-20 h-20 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-6">
+      {{ icon('x-circle','w-10 h-10 text-red-400') }}
+    </div>
+    <h1 class="text-6xl font-extrabold text-slate-800 mb-2">403</h1>
+    <h2 class="text-xl font-bold text-slate-300 mb-3">Access Denied</h2>
+    <p class="text-slate-500 mb-8 text-sm leading-relaxed">
+      You don&apos;t have permission to access this page.
+      This may be due to an invalid CSRF token or insufficient role.
+    </p>
+    <div class="flex flex-wrap items-center justify-center gap-3">
+      <a href="/" class="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold text-sm transition-all">
+        {{ icon('home','w-4 h-4') }} Go Home
+      </a>
+      {% if is_authenticated %}
+      <a href="{{ role_home }}" class="btn-ghost">My Portal</a>
+      {% else %}
+      <a href="/login" class="btn-ghost">Sign In</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

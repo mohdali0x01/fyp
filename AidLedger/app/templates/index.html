@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+
+{% block title %}Transparent Aid for Pakistan{% endblock %}
+{% block meta_description %}AidLedger — Pakistan's trusted digital aid distribution system. Apply for government assistance, check your eligibility, and receive your benefits securely.{% endblock %}
+
+{% block body %}
+<div class="hero-gradient grid-bg min-h-screen flex flex-col">
+
+  {# ── Navbar ── #}
+  <nav class="fixed top-0 left-0 right-0 z-50 border-b border-slate-800/60 backdrop-blur-xl bg-slate-950/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        {# Brand #}
+        <a href="/" class="flex items-center gap-2 group" aria-label="AidLedger Home">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center group-hover:bg-emerald-500/20 transition-all">
+            {{ icon('shield-check', 'w-4 h-4 text-emerald-400') }}
+          </div>
+          <span class="font-bold text-lg">
+            <span class="gradient-text">Aid</span><span class="text-slate-200">Ledger</span>
+          </span>
+        </a>
+
+        {# Desktop nav #}
+        <div class="hidden md:flex items-center gap-6">
+          <a href="/#how-it-works" class="text-sm text-slate-400 hover:text-slate-200 transition-colors">How it Works</a>
+          <a href="/#eligibility" class="text-sm text-slate-400 hover:text-slate-200 transition-colors">Eligibility</a>
+          <a href="/about" class="text-sm text-slate-400 hover:text-emerald-400 transition-colors">About Us</a>
+          <button onclick="toggleTheme(); updateThemeIcons()" class="text-slate-400 hover:text-emerald-400 transition-colors" aria-label="Toggle Theme">
+            <span class="theme-icon-dark">{{ m.icon_moon('w-4 h-4') }}</span>
+            <span class="theme-icon-light hidden">{{ m.icon_sun('w-4 h-4') }}</span>
+          </button>
+          {% if is_authenticated %}
+            <a href="{{ role_home }}" class="text-sm text-slate-400 hover:text-slate-200 transition-colors">
+              My Portal
+            </a>
+            <form action="/logout" method="post" class="inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+              <button type="submit" class="btn-ghost text-xs">Sign out</button>
+            </form>
+          {% else %}
+            <a href="/login" class="text-sm text-slate-400 hover:text-slate-200 transition-colors">Login</a>
+            <a href="/signup" class="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold text-sm transition-all">
+              Apply Now {{ icon('arrow-right', 'w-3.5 h-3.5') }}
+            </a>
+          {% endif %}
+        </div>
+
+        {# Mobile menu #}
+        <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-slate-200" aria-label="Open menu">
+          {{ icon('menu', 'w-5 h-5') }}
+        </button>
+      </div>
+    </div>
+
+    {# Mobile dropdown #}
+    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-800/60 bg-slate-950/95 px-4 py-4 flex flex-col gap-4">
+      <a href="/#how-it-works" onclick="toggleMobileMenu()" class="text-slate-400 hover:text-slate-200">How it Works</a>
+      <a href="/#eligibility" onclick="toggleMobileMenu()" class="text-slate-400 hover:text-slate-200">Eligibility</a>
+      <a href="/about" onclick="toggleMobileMenu()" class="text-slate-400 hover:text-emerald-400">About Us</a>
+      <button onclick="toggleTheme(); updateThemeIcons()" class="text-left text-slate-400 hover:text-emerald-400 flex items-center gap-2">
+        <span class="theme-icon-dark">{{ m.icon_moon('w-4 h-4') }}</span>
+        <span class="theme-icon-light hidden">{{ m.icon_sun('w-4 h-4') }}</span>
+        <span>Toggle Theme</span>
+      </button>
+      <hr class="border-slate-800" />
+      {% if is_authenticated %}
+        <a href="{{ role_home }}" class="text-sm text-slate-400 hover:text-slate-200 py-2">My Portal</a>
+        <form action="/logout" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+          <button type="submit" class="text-sm text-red-400 py-2">Sign Out</button>
+        </form>
+      {% else %}
+        <a href="/login" class="text-sm text-slate-400 hover:text-slate-200 py-2">Login</a>
+        <a href="/signup" class="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-500 text-slate-900 font-semibold text-sm">
+          Apply Now
+        </a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <main class="flex-1 pt-16">
+
+    {# ── Hero ── #}
+    <section class="relative pt-20 pb-16 sm:pt-32 sm:pb-24 px-4 text-center overflow-hidden group">
+      {# Theme-Adaptive Background Image Layer #}
+      <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        {# Higher baseline opacity preserves vivid colors and clarity across both light and dark mode variables #}
+        <img src="{{ url_for('static', filename='images/hero_bg.jpg') }}" alt="Pakistani citizens and children" class="w-full h-full object-cover object-center opacity-50 group-hover:opacity-70 group-hover:scale-105 transition-all duration-1000 ease-out" />
+        {# Enhanced visibility overlay: maximum center transparency to reveal the faces beautifully #}
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/10 to-slate-950"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-950/30 via-transparent to-slate-950/30"></div>
+        <div class="absolute inset-0 bg-emerald-500/5 mix-blend-color"></div>
+      </div>
+
+      <div class="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
+
+      <div class="relative z-10 max-w-4xl mx-auto animate-slide-up">
+        <h1 class="text-4xl sm:text-6xl font-extrabold text-slate-100 leading-tight mb-3 drop-shadow-md">
+          Government Aid,<br />
+          <span class="gradient-text">Done Right for Pakistan</span>
+        </h1>
+        <p class="urdu-text text-2xl sm:text-3xl text-emerald-400/90 mb-4 drop-shadow" dir="rtl">پاکستان کے لیے سرکاری امداد — شفاف اور منصفانہ</p>
+        <p class="text-lg sm:text-xl text-slate-100 max-w-2xl mx-auto leading-relaxed mb-3 font-medium drop-shadow-sm">
+          AidLedger ensures your government aid reaches you fairly and transparently.
+          Apply online, get verified automatically, and receive your benefits — no middlemen, no corruption.
+        </p>
+        <p class="urdu-text text-slate-200 max-w-2xl mx-auto leading-relaxed mb-10 font-medium drop-shadow-sm" dir="rtl">
+          ایڈلیجر یقینی بناتا ہے کہ سرکاری امداد آپ تک منصفانہ اور شفاف طریقے سے پہنچے۔
+          آن لائن درخواست دیں، خودکار تصدیق حاصل کریں اور فائدہ اٹھائیں — کوئی بیچوان نہیں، کوئی بدعنوانی نہیں۔
+        </p>
+
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          {% if is_authenticated %}
+            <a href="{{ role_home }}" class="flex items-center gap-2 px-7 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold text-base transition-all hover:shadow-xl hover:shadow-emerald-500/25">
+              {{ icon('dashboard', 'w-5 h-5') }} Go to My Portal
+            </a>
+          {% else %}
+            <a href="/signup" class="flex items-center gap-2 px-7 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold text-base transition-all hover:shadow-xl hover:shadow-emerald-500/25 animate-glow">
+              {{ icon('shield-check', 'w-5 h-5') }} Check My Eligibility — Free
+            </a>
+            <a href="/login" class="flex items-center gap-2 px-7 py-3.5 rounded-xl border border-slate-700 backdrop-blur-md bg-slate-950/70 hover:bg-slate-950/85 hover:border-emerald-500/40 text-slate-200 hover:text-slate-100 font-semibold text-base shadow-md hover:shadow-lg transition-all">
+              Sign In {{ icon('arrow-right', 'w-4 h-4') }}
+            </a>
+          {% endif %}
+        </div>
+
+        {# Trust badges #}
+        <div class="flex flex-wrap items-center justify-center gap-6 mt-12 text-xs text-slate-400/80">
+          <span class="flex items-center gap-1.5">{{ icon('check', 'w-3.5 h-3.5 text-emerald-400') }} Approved by SBP</span>
+          <span class="flex items-center gap-1.5">{{ icon('check', 'w-3.5 h-3.5 text-emerald-400') }} Tamper-Proof Records</span>
+          <span class="flex items-center gap-1.5">{{ icon('check', 'w-3.5 h-3.5 text-emerald-400') }} NADRA Verified</span>
+          <span class="flex items-center gap-1.5">{{ icon('check', 'w-3.5 h-3.5 text-emerald-400') }} No Human Bias</span>
+        </div>
+      </div>
+    </section>
+
+    {# ── Stats bar ── #}
+    <section class="py-12 border-y border-slate-800/60">
+      <div class="max-w-5xl mx-auto px-4">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+          {% for stat in [
+            ('350B PKR', 'Annual Aid Budget', 'سالانہ امدادی بجٹ'),
+            ('130K+', 'Citizens Verified', 'شہری تصدیق شدہ'),
+            ('< 60 sec', 'Average Processing Time', 'اوسط وقت'),
+            ('5 Steps', 'Automatic Verification', 'خودکار تصدیق')
+          ] %}
+          <div class="animate-fade-in">
+            <div class="text-2xl sm:text-3xl font-extrabold gradient-text">{{ stat[0] }}</div>
+            <div class="text-xs text-slate-500 mt-1 font-medium">{{ stat[1] }}</div>
+            <div class="urdu-text text-xs text-slate-600 mt-0.5">{{ stat[2] }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    {# ── Why AidLedger ── #}
+    <section class="py-20 px-4" id="how-it-works">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-14">
+          <h2 class="text-3xl sm:text-4xl font-bold text-slate-100 mb-4">Why AidLedger?</h2>
+          <p class="text-slate-500 max-w-xl mx-auto">A fair, fast, and fraud-free system built for every Pakistani citizen.</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% set features = [
+            ('shield-check', 'text-emerald-400', 'Fair & Unbiased',         'Eligibility is decided by verified data and fixed rules — no favouritism, no bribes.'),
+            ('layers',       'text-blue-400',    'Instant Identity Check',  'Your national ID is verified against official government records automatically.'),
+            ('users',        'text-purple-400',  'Family Protection',       'We ensure aid reaches families who truly need it, not those already receiving support.'),
+            ('cpu',          'text-amber-400',   'Income Assessment',       'Your economic situation is scored fairly using an approved government formula.'),
+            ('card',         'text-cyan-400',    'Digital Aid Card',        'Once approved, you receive a secure digital card to access your monthly benefits.'),
+            ('send',         'text-rose-400',    'Urdu Notifications',      'You will receive all updates about your application in Urdu — your language.')
+          ] %}
+          {% for icon_name, color, title, desc in features %}
+          <div class="glass-card p-6">
+            <div class="{{ color }} w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-current/10">
+              {{ icon(icon_name, 'w-5 h-5') }}
+            </div>
+            <h3 class="font-semibold text-slate-200 mb-2">{{ title }}</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">{{ desc }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    {# ── How the process works ── #}
+    <section class="py-20 px-4 border-t border-slate-800/60" id="eligibility">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-14">
+          <h2 class="text-3xl sm:text-4xl font-bold text-slate-100 mb-4">How Does It Work?</h2>
+          <p class="text-slate-500">From application to your card — everything happens automatically.</p>
+        </div>
+        <div class="flex flex-col gap-4">
+          {% set stages = [
+            ('1', 'shield-check', 'Identity Verification',   'Your national ID (CNIC) is checked against official government records to confirm your identity.'),
+            ('2', 'users',        'Family Check',            'We ensure no other family member in your household is already registered for this programme.'),
+            ('3', 'cpu',          'Financial Assessment',    'Your income and living situation is assessed using the government\'s official scoring method.'),
+            ('4', 'check-circle', 'Permanent Decision',      'Your result is recorded securely and cannot be altered by anyone — completely transparent.'),
+            ('5', 'card',         'Card Issuance',           'If approved, your aid card is issued by your designated bank. You can start using it immediately.')
+          ] %}
+          {% for num, icon_name, title, desc in stages %}
+          <div class="glass-card p-5 flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center shrink-0 text-sm font-bold text-emerald-400">
+              {{ num }}
+            </div>
+            <div>
+              <h3 class="font-semibold text-slate-200 mb-1">{{ title }}</h3>
+              <p class="text-sm text-slate-500">{{ desc }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        {# Eligibility criteria box #}
+        <div class="mt-10 glass-card p-6 border border-emerald-500/20">
+          <h3 class="font-semibold text-slate-200 mb-4 flex items-center gap-2">
+            {{ icon('check-circle', 'w-4 h-4 text-emerald-400') }} Who is Eligible?
+          </h3>
+          <p class="urdu-text text-emerald-400 text-sm mb-4" dir="rtl">کون اہل ہے؟</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-400">
+            <p class="flex items-start gap-2">{{ icon('check', 'w-3.5 h-3.5 text-emerald-500 mt-0.5 shrink-0') }}
+              <span>Valid Pakistani CNIC registered with NADRA<span class="urdu-text block text-xs text-slate-500" dir="rtl">نادرا کے ساتھ رجسٹرڈ پاکستانی شناختی کارڈ</span></span></p>
+            <p class="flex items-start gap-2">{{ icon('check', 'w-3.5 h-3.5 text-emerald-500 mt-0.5 shrink-0') }}
+              <span>No other family member currently receiving aid<span class="urdu-text block text-xs text-slate-500" dir="rtl">گھر میں کوئی اور فرد امداد نہ لے رہا ہو</span></span></p>
+            <p class="flex items-start gap-2">{{ icon('check', 'w-3.5 h-3.5 text-emerald-500 mt-0.5 shrink-0') }}
+              <span>Low income as per national poverty assessment<span class="urdu-text block text-xs text-slate-500" dir="rtl">سرکاری غربت کے معیار کے مطابق کم آمدنی</span></span></p>
+            <p class="flex items-start gap-2">{{ icon('check', 'w-3.5 h-3.5 text-emerald-500 mt-0.5 shrink-0') }}
+              <span>Not a government employee with fixed salary<span class="urdu-text block text-xs text-slate-500" dir="rtl">مقررہ تنخواہ والے سرکاری ملازم نہ ہوں</span></span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {# ── CTA ── #}
+    <section class="py-20 px-4 border-t border-slate-800/60">
+      <div class="max-w-2xl mx-auto text-center">
+        <div class="glass-card p-10 glow-border">
+          <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center mx-auto mb-6 animate-float">
+            {{ icon('shield-check', 'w-8 h-8 text-emerald-400') }}
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-100 mb-4">Ready to Apply?</h2>
+          <p class="text-slate-500 mb-8 leading-relaxed">
+            The process takes less than 5 minutes. Create your account, fill in your details,
+            and our system will verify your eligibility instantly.
+          </p>
+          {% if is_authenticated %}
+            <a href="{{ role_home }}" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold text-base transition-all hover:shadow-xl hover:shadow-emerald-500/25">
+              {{ icon('dashboard', 'w-5 h-5') }} Go to My Portal
+            </a>
+          {% else %}
+            <a href="/signup" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold text-base transition-all hover:shadow-xl hover:shadow-emerald-500/25 animate-glow">
+              {{ icon('shield-check', 'w-5 h-5') }} Start My Application — It&apos;s Free
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  {# ── Footer ── #}
+  <footer class="border-t border-slate-800/60 py-8 px-4">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 rounded bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center">
+          {{ icon('shield-check', 'w-3 h-3 text-emerald-400') }}
+        </div>
+        <span class="text-sm font-semibold"><span class="gradient-text">Aid</span><span class="text-slate-400">Ledger</span></span>
+      </div>
+      <p class="text-xs text-slate-600 text-center">A Government of Pakistan Initiative &middot; Secure &amp; Transparent Aid Distribution</p>
+      <div class="flex items-center gap-4 text-xs text-slate-600">
+        <a href="/#how-it-works" class="hover:text-slate-400 transition-colors">How it Works</a>
+        <a href="/about" class="hover:text-slate-400 transition-colors">About Us</a>
+        <a href="/login" class="hover:text-slate-400 transition-colors">Login</a>
+        <a href="/signup" class="hover:text-slate-400 transition-colors">Apply</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+function toggleMobileMenu() {
+  document.getElementById('mobile-menu').classList.toggle('hidden');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,387 @@
+{% extends "dashboard/_layout.html" %}
+
+{% block title %}میرا کارڈ — My Aid Card{% endblock %}
+{% block page_title %}My Aid Card{% endblock %}
+
+{% block dashboard_content %}
+<div class="max-w-2xl mx-auto space-y-6">
+
+  <div class="mb-2">
+    <div class="bilingual-label mb-1">
+      <h1 class="text-2xl font-bold text-slate-100">My Aid Card</h1>
+      <span class="urdu-sm text-emerald-400/80">میرا امدادی کارڈ</span>
+    </div>
+    <p class="text-sm text-slate-500">Your physical humanitarian aid card powered by blockchain.</p>
+    <p class="urdu-text text-slate-500 text-xs mt-0.5" dir="rtl">بلاک چین پر مبنی آپ کا سرکاری امدادی کارڈ</p>
+  </div>
+
+  {# ── State 1: No application yet ── #}
+  {% if not registration %}
+  <div class="glass-card p-10 text-center">
+    <div class="w-16 h-16 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center mx-auto mb-4">
+      {{ icon('card','w-8 h-8 text-slate-600') }}
+    </div>
+    <h3 class="text-lg font-semibold text-slate-300 mb-1">No Card Available</h3>
+    <p class="urdu-text text-slate-400 text-base mb-3" dir="rtl">کوئی کارڈ موجود نہیں</p>
+    <p class="text-sm text-slate-500 mb-2">You must submit an application first before a card can be issued.</p>
+    <p class="urdu-text text-slate-500 text-sm mb-6" dir="rtl">کارڈ جاری ہونے سے پہلے آپ کو درخواست دینا ضروری ہے۔</p>
+    <a href="/dashboard/apply"
+       class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold text-sm transition-all">
+      {{ icon('file','w-4 h-4') }} Apply Now
+    </a>
+  </div>
+
+  {# ── State 2: Applied but card not issued yet ── #}
+  {% elif not card %}
+  <div class="glass-card p-10 text-center">
+    <div class="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/25 flex items-center justify-center mx-auto mb-4 animate-pulse">
+      {{ icon('card','w-8 h-8 text-amber-400') }}
+    </div>
+    <h3 class="text-lg font-semibold text-slate-300 mb-1">
+      {% if registration.pipeline_status == 'ELIGIBLE' %}Card Being Prepared
+      {% elif registration.pipeline_status == 'PENDING' %}Application Under Review
+      {% else %}Not Eligible
+      {% endif %}
+    </h3>
+    <p class="urdu-text text-amber-400/80 text-base mb-3" dir="rtl">
+      {% if registration.pipeline_status == 'ELIGIBLE' %}آپ کا کارڈ تیار کیا جا رہا ہے
+      {% elif registration.pipeline_status == 'PENDING' %}آپ کی درخواست زیر جائزہ ہے
+      {% else %}آپ اہل نہیں ہیں — کارڈ جاری نہیں ہو گا
+      {% endif %}
+    </p>
+    <p class="text-sm text-slate-500 mb-6 max-w-sm mx-auto">
+      {% if registration.pipeline_status == 'ELIGIBLE' %}
+        Your eligibility has been confirmed. A card will be assigned to you shortly.
+      {% elif registration.pipeline_status in ['KYC_FAILED','FAMILY_INELIGIBLE','PMT_FAILED'] %}
+        Your application did not meet the eligibility criteria.
+      {% else %}
+        Your application is being processed. Check back soon.
+      {% endif %}
+    </p>
+    <a href="/dashboard/status" class="inline-flex items-center gap-1.5 text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
+      {{ icon('shield-check','w-4 h-4') }} View Application Status
+    </a>
+  </div>
+
+  {# ── State 3: Show scanner if ELIGIBLE (even if card record is missing or pending) ── #}
+  {% elif registration.pipeline_status == 'ELIGIBLE' and (not card or card.card_status == 'PENDING_LINK') %}
+  <div class="glass-card p-6 border border-amber-500/20">
+
+    {# Kiosk instruction banner #}
+    <div class="flex items-start gap-4 p-4 rounded-xl bg-amber-500/8 border border-amber-500/20 mb-6">
+      <div class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center shrink-0">
+        {{ icon('card','w-5 h-5 text-amber-400') }}
+      </div>
+      <div>
+        <p class="font-semibold text-amber-300 text-sm">Action Required — Link Your Physical Card</p>
+        <p class="urdu-text text-amber-400/80 text-sm mt-0.5" dir="rtl">اپنا فزیکل کارڈ لنک کریں</p>
+        <p class="text-xs text-slate-400 mt-2">
+          Your aid has been approved. Place a blank plastic card on the RFID reader below to activate your funds.
+        </p>
+        <p class="urdu-text text-xs text-slate-500 mt-1" dir="rtl">
+          آپ کی امداد منظور ہو گئی ہے۔ اپنا خالی پلاسٹک کارڈ ریڈر پر رکھیں تاکہ رقم فعال ہو سکے۔
+        </p>
+      </div>
+    </div>
+
+    {# RFID Scanner UI #}
+    <div id="rfid-otp-section">
+      <div id="rfid-scanner-area"
+           class="relative border-2 border-dashed border-slate-700 hover:border-emerald-500/50 rounded-2xl p-8 text-center transition-all duration-300 cursor-pointer group"
+           onclick="document.getElementById('rfid-uid-input').focus()">
+        {# Animated scan ring #}
+        <div id="scan-ring" class="w-20 h-20 rounded-full border-2 border-slate-700 group-hover:border-emerald-500/40 flex items-center justify-center mx-auto mb-4 transition-all relative">
+          <div class="absolute inset-0 rounded-full border-2 border-emerald-500/30 animate-ping opacity-0 group-hover:opacity-100"></div>
+          <svg class="w-9 h-9 text-slate-600 group-hover:text-emerald-400 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+            <line x1="6" y1="15" x2="10" y2="15"/>
+            <line x1="14" y1="15" x2="18" y2="15"/>
+          </svg>
+        </div>
+        <p class="font-semibold text-slate-300 mb-1">Scan your card to connect to your account</p>
+        <p class="urdu-text text-slate-400 text-base mb-2" dir="rtl">اپنا کارڈ لنک کرنے کے لیے اسکین کریں</p>
+        <p class="text-xs text-slate-600">Place your physical RFID card on the reader</p>
+        <p class="urdu-text text-xs text-slate-600 mt-0.5" dir="rtl">اپنا کارڈ ریڈر پر رکھیں</p>
+
+        {# Hidden RFID capture form — RFID reader types into this #}
+        <form id="rfid-form"
+              hx-post="/dashboard/card/link"
+              hx-target="#rfid-otp-section"
+              hx-swap="outerHTML"
+              class="mt-0">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+          <input
+            id="rfid-uid-input"
+            name="rfid_uid"
+            type="text"
+            autocomplete="off"
+            class="absolute opacity-0 w-0 h-0 pointer-events-none"
+            tabindex="-1"
+          />
+        </form>
+      </div>
+      <p id="rfid-status" class="text-center text-xs text-slate-600 mt-3">Waiting for card…</p>
+    </div>
+  </div>
+
+  {# ── State 4: Card fully active ── #}
+  {% else %}
+
+  {# Physical Card Visual #}
+  <div class="virtual-card animate-glow">
+    {# Card header #}
+    <div class="flex items-start justify-between mb-8">
+      <div>
+        <p class="text-[10px] text-emerald-400 font-bold tracking-widest uppercase mb-0.5">AIDLEDGER</p>
+        <p class="text-[10px] text-white/60 uppercase tracking-tight font-medium">Humanitarian Aid Card</p>
+        <p class="urdu-text text-[10px] text-white/40 mt-0.5" dir="rtl">سرکاری امدادی کارڈ</p>
+      </div>
+      <div class="flex items-center gap-2">
+        {# RFID chip icon #}
+        <div class="w-8 h-6 rounded bg-amber-400/80 flex items-center justify-center">
+          <div class="w-4 h-3 rounded-sm border border-amber-600/60 grid grid-cols-3 gap-px p-0.5">
+            <div class="bg-amber-600/40 rounded-sm"></div>
+            <div class="bg-amber-600/40 rounded-sm"></div>
+            <div class="bg-amber-600/40 rounded-sm"></div>
+          </div>
+        </div>
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center">
+          {{ icon('shield-check','w-4 h-4 text-emerald-400') }}
+        </div>
+      </div>
+    </div>
+
+    {# RFID UID as card identifier #}
+    <div class="mb-6">
+      <p class="text-[10px] text-white/50 mb-2 tracking-widest font-bold">CARD ID (RFID)</p>
+      <div class="flex items-center gap-3">
+        <p class="text-xl font-mono font-bold text-white tracking-[0.3em]">
+          {{ card.virtual_card_number[:4] if card.virtual_card_number else '••••' }}
+          ••••
+          {{ card.virtual_card_number[-4:] if card.virtual_card_number else '••••' }}
+        </p>
+        <button
+          id="copy-card-btn"
+          onclick="copyToClipboard('{{ card.virtual_card_number }}','copy-card-btn')"
+          class="p-1.5 rounded-lg hover:bg-emerald-500/10 text-slate-500 hover:text-emerald-400 transition-colors"
+          title="Copy card ID">
+          {{ icon('copy','w-4 h-4') }}
+        </button>
+      </div>
+    </div>
+
+    <div class="flex items-end justify-between">
+      <div>
+        <p class="text-[10px] text-white/50 mb-1 tracking-widest font-bold">CARDHOLDER</p>
+        <p class="font-bold text-white text-lg tracking-wide">{{ registration.full_name | upper }}</p>
+      </div>
+      <div class="text-right">
+        <p class="text-[10px] text-white/50 mb-1 tracking-widest font-bold">STATUS</p>
+        <span class="badge-eligible text-xs">{{ icon('shield-check','w-3 h-3') }} Active</span>
+      </div>
+    </div>
+  </div>
+
+  {# ── Smart Contract Limits ── #}
+  <div class="glass-card p-6 border border-emerald-500/15">
+    <div class="bilingual-label mb-4">
+      <h2 class="font-semibold text-slate-200 flex items-center gap-2">
+        {{ icon('layers','w-4 h-4 text-emerald-400') }} Spending Limits
+      </h2>
+      <span class="urdu-sm text-slate-500">خرچ کرنے کی حدیں</span>
+    </div>
+    <p class="text-xs text-slate-600 mb-4">Enforced by smart contract on blockchain — cannot be changed by anyone.</p>
+    <p class="urdu-text text-xs text-slate-600 mb-4" dir="rtl">یہ حدیں بلاک چین کے سمارٹ کنٹریکٹ پر ہیں — کوئی بھی تبدیل نہیں کر سکتا۔</p>
+    <div class="grid grid-cols-2 gap-4">
+      {# ATM Limit #}
+      <div class="p-4 rounded-xl bg-blue-500/8 border border-blue-500/20">
+        <div class="flex items-center gap-2 mb-2">
+          <svg class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+          </svg>
+          <p class="text-xs text-slate-500 font-medium">ATM / Cash</p>
+        </div>
+        <p class="text-xl font-bold text-blue-400">PKR 10,000</p>
+        <p class="text-xs text-slate-600 mt-1">per withdrawal cycle</p>
+        <p class="urdu-text text-xs text-slate-600 mt-0.5" dir="rtl">فی نقد ادائیگی</p>
+      </div>
+      {# Vendor Limit #}
+      <div class="p-4 rounded-xl bg-emerald-500/8 border border-emerald-500/20">
+        <div class="flex items-center gap-2 mb-2">
+          <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          <p class="text-xs text-slate-500 font-medium">Authorized Vendor</p>
+        </div>
+        <p class="text-xl font-bold text-emerald-400">PKR 15,000</p>
+        <p class="text-xs text-slate-600 mt-1">per vendor transaction</p>
+        <p class="urdu-text text-xs text-slate-600 mt-0.5" dir="rtl">فی دکاندار خریداری</p>
+      </div>
+    </div>
+    <div class="mt-4 p-3 rounded-xl bg-slate-800/40 flex items-center gap-2">
+      {{ icon('shield-check','w-4 h-4 text-emerald-400 shrink-0') }}
+      <div>
+        <p class="text-xs text-slate-400">Quarterly Total Limit: <strong class="text-slate-200">PKR 25,000</strong></p>
+        <p class="urdu-text text-xs text-slate-600 mt-0.5" dir="rtl">تین ماہ کی کل حد: 25,000 روپے</p>
+      </div>
+    </div>
+  </div>
+
+  {# How to use — updated for RFID physical card #}
+  <div class="glass-card p-6">
+    <div class="bilingual-label mb-4">
+      <h2 class="font-semibold text-slate-200 flex items-center gap-2">
+        {{ icon('alert','w-4 h-4 text-amber-400') }} How to Use Your Card
+      </h2>
+      <span class="urdu-sm text-amber-400">کارڈ کا استعمال</span>
+    </div>
+    <ul class="space-y-4 text-sm">
+      <li class="flex items-start gap-3">
+        <span class="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+        <div>
+          <p class="text-slate-300">Go to any authorized vendor or ATM and tap your physical card on the RFID reader.</p>
+          <p class="urdu-text text-slate-500 text-xs mt-0.5" dir="rtl">کسی بھی مجاز دکان یا ATM پر جائیں اور اپنا کارڈ ریڈر پر رکھیں۔</p>
+        </div>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+        <div>
+          <p class="text-slate-300">Your transaction is recorded on the blockchain and deducted from your quarterly limit.</p>
+          <p class="urdu-text text-slate-500 text-xs mt-0.5" dir="rtl">آپ کا لین دین بلاک چین پر محفوظ ہوگا اور آپ کی سہ ماہی حد میں سے کاٹا جائے گا۔</p>
+        </div>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+        <div>
+          <p class="text-slate-300">Do not share your card with anyone. Your funds are protected by blockchain encryption.</p>
+          <p class="urdu-text text-slate-500 text-xs mt-0.5" dir="rtl">اپنا کارڈ کسی کو نہ دیں۔ آپ کی رقم بلاک چین انکرپشن سے محفوظ ہے۔</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+  {# ── Spending History ── #}
+  <div class="glass-card p-6">
+    <div class="bilingual-label mb-4">
+      <h2 class="font-semibold text-slate-200 flex items-center gap-2">
+        {{ icon('file','w-4 h-4 text-emerald-400') }} Spending History
+      </h2>
+      <span class="urdu-sm text-slate-500">خرچ کی تاریخ</span>
+    </div>
+
+    {% if transactions %}
+    <div class="space-y-0 divide-y divide-slate-800/40">
+      {% for txn in transactions %}
+      <div class="py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+            <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-slate-200">PKR {{ "{:,.0f}".format(txn.amount) }}</p>
+            <p class="text-xs text-slate-500">
+              {{ txn.timestamp.strftime('%d %b %Y, %I:%M %p') if txn.timestamp else '—' }}
+            </p>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-emerald-400 flex items-center gap-1 justify-end">
+            {{ icon('shield-check','w-3 h-3') }} Blockchain Verified
+          </span>
+          <button
+            onclick="copyToClipboard('{{ txn.blockchain_tx_hash }}', this)"
+            class="text-xs text-slate-700 font-mono hover:text-slate-400 transition-colors mt-0.5"
+            title="Copy TX Hash"
+          >{{ txn.blockchain_tx_hash[:10] }}…</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-6">
+      <svg class="w-10 h-10 text-slate-700 mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+      </svg>
+      <p class="text-sm text-slate-500">No transactions yet</p>
+      <p class="urdu-text text-xs text-slate-600 mt-1" dir="rtl">ابھی تک کوئی لین دین نہیں ہوا</p>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// ── RFID Reader Detection (Keyboard Emulator) ─────────────────────────────────
+// RFID readers type their data very fast (< 50ms between chars) and end with Enter.
+// We detect this "burst typing" pattern to distinguish it from a real human typing.
+(function() {
+  const input   = document.getElementById('rfid-uid-input');
+  const form    = document.getElementById('rfid-form');
+  const status  = document.getElementById('rfid-status');
+  const ring    = document.getElementById('scan-ring');
+  if (!input || !form) return;
+
+  let buffer    = '';
+  let lastTime  = 0;
+  const RFID_SPEED_THRESHOLD = 250; // ms — Accommodates USB latency variations in WSL/Windows
+
+  // Keep the hidden input always focused on the card page
+  document.addEventListener('click', function() {
+    if (document.getElementById('rfid-uid-input')) {
+      input.focus();
+    }
+  });
+
+  // Auto-focus on load
+  setTimeout(() => input.focus(), 300);
+
+  document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('rfid-uid-input')) return;
+
+    const now = Date.now();
+    const timeSinceLast = now - lastTime;
+
+    if (e.key === 'Enter') {
+      if (buffer.length >= 6) {
+        // Valid RFID read — populate input and submit
+        input.value = buffer;
+        if (status) {
+          status.textContent = 'Card detected: ' + buffer.slice(0, 4) + '****' + buffer.slice(-4);
+          status.className = 'text-center text-xs text-emerald-400 mt-3 font-medium';
+        }
+        if (ring) ring.classList.add('!border-emerald-500');
+        // Submit via HTMX
+        setTimeout(() => htmx.trigger(form, 'submit'), 200);
+      }
+      buffer = '';
+      lastTime = 0;
+      e.preventDefault();
+      return;
+    }
+
+    // Only capture if typing is rapid (RFID speed) or buffer is being built
+    if (e.key.length === 1) {
+      if (buffer.length === 0) {
+        buffer = e.key;
+        lastTime = now;
+      } else if (timeSinceLast < RFID_SPEED_THRESHOLD) {
+        buffer += e.key;
+        lastTime = now;
+      } else {
+        buffer = e.key;
+        lastTime = now;
+      }
+      if (status && buffer.length > 0) {
+        status.textContent = 'Reading card…';
+        status.className = 'text-center text-xs text-amber-400 mt-3 animate-pulse';
+      }
+    }
+  });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,37 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# AidLedger Flask Backend — Python Dependencies
+# Install in WSL Ubuntu:
+#   cd /mnt/e/FYP/AidLedger && python3 -m venv venv && source venv/bin/activate
+#   pip install -r requirements.txt
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Core Framework
+flask==3.1.0
+flask-cors==5.0.1
+
+# Security
+flask-limiter==3.10.1
+flask-talisman==1.1.0
+bcrypt==4.3.0
+PyJWT==2.10.1
+
+# Validation
+pydantic==2.11.4
+
+# Database
+prisma==0.15.0
+
+# Blockchain
+web3==7.10.0
+
+# Environment
+python-dotenv==1.1.0
+
+# ID generation
+uuid6==2024.1.12
+
+# Production server
+gunicorn==23.0.0
+
+# SMS / OTP Verification
+twilio>=9.0.0

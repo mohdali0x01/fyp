@@ -1,0 +1,73 @@
+{% extends "admin/_layout.html" %}
+{% set portal_title = "AidLedger Admin" %}
+{% set portal_color = "emerald" %}
+{% set portal_icon  = "shield-check" %}
+{% block title %}Policies — AidLedger Admin{% endblock %}
+{% block page_title %}Policy Management{% endblock %}
+{% block sidebar_nav %}
+<div class="px-3">
+  <p class="text-xs text-slate-600 uppercase tracking-wider font-semibold px-2 mb-2">Management</p>
+  <a href="/admin" class="sidebar-link">{{ icon('dashboard','w-4 h-4') }} Overview</a>
+  <a href="/admin/registrations" class="sidebar-link">{{ icon('users','w-4 h-4') }} All Applications</a>
+  <a href="/admin/policies" class="sidebar-link">{{ icon('layers','w-4 h-4') }} Policies</a>
+  <a href="/admin/network" class="sidebar-link">{{ icon('network','w-4 h-4') }} Blockchain Network</a>
+</div>
+{% endblock %}
+{% block portal_content %}
+<div class="max-w-4xl mx-auto space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-100">Policy Management</h1>
+    <p class="text-sm text-slate-500 mt-1">View and manage active eligibility policy parameters.</p>
+  </div>
+  {% if policies %}
+  {% for p in policies %}
+  <div class="glass-card p-6 {{ 'border border-emerald-500/20' if p.is_active else '' }}">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="font-semibold text-slate-200 flex items-center gap-2">
+        {{ icon('layers','w-4 h-4 text-blue-400') }} Policy #{{ p.policy_id }}
+      </h2>
+      {% if p.is_active %}
+        <span class="badge-eligible">{{ icon('check','w-3 h-3') }} Active</span>
+      {% else %}
+        <span class="badge-pending">Inactive</span>
+      {% endif %}
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+      <div class="p-3 bg-slate-800/40 rounded-xl">
+        <div class="text-xs text-slate-500 mb-1">Annual Budget</div>
+        <div class="font-semibold text-slate-200">PKR {{ "{:,.0f}".format(p.global_budget) }}</div>
+      </div>
+      <div class="p-3 bg-slate-800/40 rounded-xl">
+        <div class="text-xs text-slate-500 mb-1">Max Monthly Aid</div>
+        <div class="font-semibold text-slate-200">PKR {{ "{:,.0f}".format(p.max_cash_limit) }}</div>
+      </div>
+      <div class="p-3 bg-slate-800/40 rounded-xl">
+        <div class="text-xs text-slate-500 mb-1">Quarterly Limit</div>
+        <div class="font-semibold text-slate-200">PKR {{ "{:,.0f}".format(p.max_quarterly_limit) }}</div>
+      </div>
+      <div class="p-3 bg-slate-800/40 rounded-xl">
+        <div class="text-xs text-slate-500 mb-1">Max Income Allowed</div>
+        <div class="font-semibold text-slate-200">PKR {{ "{:,.0f}".format(p.max_salary_allowed) }}</div>
+      </div>
+      <div class="p-3 bg-slate-800/40 rounded-xl">
+        <div class="text-xs text-slate-500 mb-1">Urban PMT Limit</div>
+        <div class="font-semibold text-slate-200">{{ p.urban_pmt_limit }}</div>
+      </div>
+      <div class="p-3 bg-slate-800/40 rounded-xl">
+        <div class="text-xs text-slate-500 mb-1">Rural PMT Limit</div>
+        <div class="font-semibold text-slate-200">{{ p.rural_pmt_limit }}</div>
+      </div>
+      <div class="p-3 bg-slate-800/40 rounded-xl">
+        <div class="text-xs text-slate-500 mb-1">Max Family Members</div>
+        <div class="font-semibold text-slate-200">{{ p.max_family_members }}</div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <div class="glass-card p-10 text-center">
+    <p class="text-slate-500 text-sm">No policies found in the system.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

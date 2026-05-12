@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="{% block meta_description %}AidLedger — Blockchain-powered transparent aid distribution for Pakistan.{% endblock %}" />
+  <meta name="robots" content="index, follow" />
+  <title>{% block title %}AidLedger{% endblock %} | AidLedger</title>
+
+  <!-- Security -->
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      if (theme === 'light') document.documentElement.classList.add('light-theme');
+    })();
+    function toggleTheme() {
+      const html = document.documentElement;
+      html.classList.toggle('light-theme');
+      localStorage.setItem('theme', html.classList.contains('light-theme') ? 'light' : 'dark');
+      updateThemeIcons();
+    }
+    function updateThemeIcons() {
+      const isLight = document.documentElement.classList.contains('light-theme');
+      document.querySelectorAll('.theme-icon-dark').forEach(el => el.classList.toggle('hidden', isLight));
+      document.querySelectorAll('.theme-icon-light').forEach(el => el.classList.toggle('hidden', !isLight));
+    }
+    document.addEventListener('DOMContentLoaded', updateThemeIcons);
+  </script>
+  <!-- Tailwind CSS (CDN — no build step) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            emerald: {
+              400: 'rgb(var(--c-em-400) / <alpha-value>)',
+              500: 'rgb(var(--c-em-500) / <alpha-value>)'
+            },
+            slate: {
+              950: 'rgb(var(--c-sl-950) / <alpha-value>)',
+              900: 'rgb(var(--c-sl-900) / <alpha-value>)',
+              800: 'rgb(var(--c-sl-800) / <alpha-value>)',
+              700: 'rgb(var(--c-sl-700) / <alpha-value>)',
+              600: 'rgb(var(--c-sl-600) / <alpha-value>)',
+              500: 'rgb(var(--c-sl-500) / <alpha-value>)',
+              400: 'rgb(var(--c-sl-400) / <alpha-value>)',
+              300: 'rgb(var(--c-sl-300) / <alpha-value>)',
+              200: 'rgb(var(--c-sl-200) / <alpha-value>)',
+              100: 'rgb(var(--c-sl-100) / <alpha-value>)'
+            }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+
+  <!-- HTMX -->
+  <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js" defer></script>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-full flex flex-col antialiased">
+
+<!-- ── Toast container ──────────────────────────────────────────────────── -->
+<div id="toast-container" aria-live="polite"></div>
+
+<!-- ── Flash messages (server-side) ─────────────────────────────────────── -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="fixed top-4 right-4 z-50 flex flex-col gap-2" id="flash-messages">
+      {% for category, message in messages %}
+        <div class="flash-{{ category }} flash-auto-dismiss flex items-center gap-2">
+          {% if category == 'success' %}
+            {{ icon('check-circle', 'w-4 h-4 shrink-0') }}
+          {% elif category == 'error' %}
+            {{ icon('x-circle', 'w-4 h-4 shrink-0') }}
+          {% else %}
+            {{ icon('alert', 'w-4 h-4 shrink-0') }}
+          {% endif %}
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+{% block body %}{% endblock %}
+
+<!-- App JS -->
+<script src="{{ url_for('static', filename='js/htmx-helpers.js') }}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

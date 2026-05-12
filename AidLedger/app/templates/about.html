@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+
+{% block title %}About Us — AidLedger Core Team & Leadership{% endblock %}
+{% block meta_description %}Meet the academic leadership and project team behind AidLedger: Dr. Shahbaz Akhtar Siddiqui,
+Mr. Usama Antuley, and core engineering contributors Muhammad Ali, Usman Ghani, and Abdul Moueed.{% endblock %}
+
+{% block body %}
+<div class="hero-gradient grid-bg min-h-screen flex flex-col">
+
+  {# ── Navbar ── #}
+  <nav class="fixed top-0 left-0 right-0 z-50 border-b border-slate-800/60 backdrop-blur-xl bg-slate-950/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        {# Brand #}
+        <a href="/" class="flex items-center gap-2 group" aria-label="AidLedger Home">
+          <div
+            class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center group-hover:bg-emerald-500/20 transition-all">
+            {{ icon('shield-check', 'w-4 h-4 text-emerald-400') }}
+          </div>
+          <span class="font-bold text-lg">
+            <span class="gradient-text">Aid</span><span class="text-slate-200">Ledger</span>
+          </span>
+        </a>
+
+        {# Desktop nav #}
+        <div class="hidden md:flex items-center gap-6">
+          <a href="/#how-it-works" class="text-sm text-slate-400 hover:text-slate-200 transition-colors">How it
+            Works</a>
+          <a href="/#eligibility" class="text-sm text-slate-400 hover:text-slate-200 transition-colors">Eligibility</a>
+          <a href="/about" class="text-sm text-emerald-400 font-medium transition-colors">About Us</a>
+          <button onclick="toggleTheme(); updateThemeIcons()"
+            class="text-slate-400 hover:text-emerald-400 transition-colors" aria-label="Toggle Theme">
+            <span class="theme-icon-dark">{{ m.icon_moon('w-4 h-4') }}</span>
+            <span class="theme-icon-light hidden">{{ m.icon_sun('w-4 h-4') }}</span>
+          </button>
+          {% if is_authenticated %}
+          <a href="{{ role_home }}" class="text-sm text-slate-400 hover:text-slate-200 transition-colors">
+            My Portal
+          </a>
+          <form action="/logout" method="post" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+            <button type="submit" class="btn-ghost text-xs">Sign out</button>
+          </form>
+          {% else %}
+          <a href="/login" class="text-sm text-slate-400 hover:text-slate-200 transition-colors">Login</a>
+          <a href="/signup"
+            class="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold text-sm transition-all">
+            Apply Now {{ icon('arrow-right', 'w-3.5 h-3.5') }}
+          </a>
+          {% endif %}
+        </div>
+
+        {# Mobile menu #}
+        <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-slate-200"
+          aria-label="Open menu">
+          {{ icon('menu', 'w-5 h-5') }}
+        </button>
+      </div>
+    </div>
+
+    {# Mobile dropdown #}
+    <div id="mobile-menu"
+      class="hidden md:hidden border-t border-slate-800/60 bg-slate-950/95 px-4 py-4 flex flex-col gap-4">
+      <a href="/#how-it-works" onclick="toggleMobileMenu()" class="text-slate-400 hover:text-slate-200">How it Works</a>
+      <a href="/#eligibility" onclick="toggleMobileMenu()" class="text-slate-400 hover:text-slate-200">Eligibility</a>
+      <a href="/about" onclick="toggleMobileMenu()" class="text-emerald-400 font-medium">About Us</a>
+      <button onclick="toggleTheme(); updateThemeIcons()"
+        class="text-left text-slate-400 hover:text-emerald-400 flex items-center gap-2">
+        <span class="theme-icon-dark">{{ m.icon_moon('w-4 h-4') }}</span>
+        <span class="theme-icon-light hidden">{{ m.icon_sun('w-4 h-4') }}</span>
+        <span>Toggle Theme</span>
+      </button>
+      <hr class="border-slate-800" />
+      {% if is_authenticated %}
+      <a href="{{ role_home }}" class="text-sm text-slate-400 hover:text-slate-200 py-2">My Portal</a>
+      <form action="/logout" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+        <button type="submit" class="text-sm text-red-400 py-2">Sign Out</button>
+      </form>
+      {% else %}
+      <a href="/login" class="text-sm text-slate-400 hover:text-slate-200 py-2">Login</a>
+      <a href="/signup"
+        class="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-500 text-slate-900 font-semibold text-sm">
+        Apply Now
+      </a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <main class="flex-1 pt-24 pb-20 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto space-y-16">
+
+      {# Header Banner #}
+      <div class="text-center animate-slide-up">
+        <div
+          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest mb-4">
+          {{ icon('shield-check', 'w-3.5 h-3.5') }} Capstone Project Architecture
+        </div>
+        <h1 class="text-4xl sm:text-6xl font-extrabold text-slate-100 tracking-tight leading-tight">
+          Behind <span class="gradient-text">AidLedger</span>
+        </h1>
+        <p class="text-slate-400 text-base sm:text-lg mt-4 max-w-2xl mx-auto leading-relaxed">
+          A state-of-the-art humanitarian aid framework securing corruption-free distribution across Pakistan through
+          decentralized verification pipelines and transparent blockchain tracking.
+        </p>
+      </div>
+
+      {# ── Section 1: Academic Leadership & Project Supervisors ── #}
+      <div class="space-y-8 animate-slide-up" style="animation-delay: 0.1s;">
+        <div class="border-b border-slate-800/80 pb-4 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-amber-500 uppercase tracking-widest">Guidance &amp; Supervision</p>
+            <h2 class="text-2xl font-extrabold text-slate-200 mt-1 flex items-center gap-2">
+              Academic Leadership
+            </h2>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+          {# Supervisor 1: Dr Shahbaz Siddiqui #}
+          <div
+            class="p-8 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-md relative overflow-hidden group hover:border-amber-500/40 transition-all flex flex-col justify-between">
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl group-hover:bg-amber-500/10 transition-all">
+            </div>
+
+            <div class="space-y-4 relative z-10">
+              <div class="flex items-start justify-between gap-4">
+                <div class="flex items-center gap-3.5">
+                  <div
+                    class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 text-amber-400 font-black text-lg">
+                    SS
+                  </div>
+                  <div>
+                    <h3 class="text-xl font-bold text-slate-100 group-hover:text-amber-400 transition-colors">Dr.
+                      Shahbaz Akhtar Siddiqui</h3>
+                    <p class="text-xs font-semibold text-amber-500/90 mt-0.5">Associate Professor &amp; Head of CYS/CE
+                      Department</p>
+                  </div>
+                </div>
+              </div>
+
+              <p class="text-slate-300 text-sm leading-relaxed text-justify">
+                Dr. Shahbaz Akhtar Siddiqui is a prominent academic leader currently serving as an Associate Professor
+                and the Head of the Cyber Security &amp; Computer Engineering Department at FAST-NUCES, Karachi. With a
+                PhD in Computer Science, he bridges the gap between high-level research and practical application,
+                specializing in Blockchain, Agentic AI, and Digital Forensics. Beyond the classroom, he is known for his
+                collaboration with industry and government bodies, including work with the FIA on anti-money laundering
+                initiatives, and he frequently leads specialized workshops to prepare students and professionals for the
+                evolving tech landscape.
+              </p>
+            </div>
+
+            <div class="pt-6 mt-6 border-t border-slate-800/60 flex items-center justify-between relative z-10">
+              <span class="text-xs text-slate-500 italic">Project Supervisor</span>
+              <a href="https://pk.linkedin.com/in/shahbaz-siddiqui-3783831a" target="_blank" rel="noopener noreferrer"
+                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-amber-400 text-xs font-semibold transition-all">
+                LinkedIn Profile {{ icon('external', 'w-3 h-3') }}
+              </a>
+            </div>
+          </div>
+
+          {# Supervisor 2: Mr Usama Antuley #}
+          <div
+            class="p-8 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-md relative overflow-hidden group hover:border-amber-500/40 transition-all flex flex-col justify-between">
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl group-hover:bg-amber-500/10 transition-all">
+            </div>
+
+            <div class="space-y-4 relative z-10">
+              <div class="flex items-start justify-between gap-4">
+                <div class="flex items-center gap-3.5">
+                  <div
+                    class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 text-amber-400 font-black text-lg">
+                    UA
+                  </div>
+                  <div>
+                    <h3 class="text-xl font-bold text-slate-100 group-hover:text-amber-400 transition-colors">Mr. Usama
+                      Antuley</h3>
+                    <p class="text-xs font-semibold text-amber-500/90 mt-0.5">Lecturer &amp; PhD Scholar</p>
+                  </div>
+                </div>
+              </div>
+
+              <p class="text-slate-300 text-sm leading-relaxed text-justify">
+                Mr. Usama Antuley is a dedicated Lecturer and PhD Scholar at FAST-NUCES Karachi, where he combines his
+                teaching responsibilities with advanced research in Computer Science. With an academic background from
+                NED University, his current scholarly work focuses on the intersection of Agentic AI, Blockchain, and
+                Smart City infrastructure. He is recognized for his hands-on approach to research, particularly in
+                developing machine learning solutions for local challenges like urban flood prediction, while actively
+                mentoring students in the fields of cyber security and adaptive trust systems.
+              </p>
+            </div>
+
+            <div class="pt-6 mt-6 border-t border-slate-800/60 flex items-center justify-between relative z-10">
+              <span class="text-xs text-slate-500 italic">Project Co-Supervisor</span>
+              <a href="https://pk.linkedin.com/in/usama-antuley-74976a11a" target="_blank" rel="noopener noreferrer"
+                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-amber-400 text-xs font-semibold transition-all">
+                LinkedIn Profile {{ icon('external', 'w-3 h-3') }}
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      {# ── Section 2: Core Engineering & Development Team ── #}
+      <div class="space-y-8 animate-slide-up" style="animation-delay: 0.2s;">
+        <div class="border-b border-slate-800/80 pb-4 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-emerald-500 uppercase tracking-widest">Engineering Implementation</p>
+            <h2 class="text-2xl font-extrabold text-slate-200 mt-1 flex items-center gap-2">
+              Project Development Team
+            </h2>
+          </div>
+
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+          {# Team Member 1: Muhammad Ali #}
+          <div
+            class="p-7 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-md relative overflow-hidden group hover:border-emerald-500/40 transition-all flex flex-col justify-between">
+            <div
+              class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition-all">
+            </div>
+
+            <div class="space-y-4 relative z-10">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center shrink-0 text-emerald-400 font-bold text-base">
+                  MA
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold text-slate-100 group-hover:text-emerald-400 transition-colors">Muhammad
+                    Ali</h3>
+                  <p class="text-[11px] font-semibold text-emerald-500 mt-0.5">Cybersecurity Analyst</p>
+                </div>
+              </div>
+
+              <div
+                class="inline-block px-2.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-[10px] text-slate-400 font-bold tracking-wider uppercase">
+                SOC Operations &amp; Smart Contracts
+              </div>
+
+              <p class="text-slate-300 text-xs leading-relaxed text-justify">
+                Cybersecurity professional with a strong interest in blockchain-driven systems and defensive security
+                operations. Bridges the gap between robust security operations and decentralized technology to build
+                transparent, tamper-resistant systems. Demonstrates technical proficiency in SOC operations and threat
+                monitoring using tools like Splunk and Wazuh, alongside hands-on experience in developing secure
+                Ethereum-based smart contracts. Leverages a competitive edge as a CTF winner to ensure the integrity of
+                digital infrastructures.
+              </p>
+            </div>
+
+            <div class="pt-5 mt-5 border-t border-slate-800/60 flex items-center justify-between relative z-10">
+              <span class="text-[11px] text-slate-500 font-medium">Core Contributor</span>
+              <a href="https://www.linkedin.com/in/muhammadali-ma/" target="_blank" rel="noopener noreferrer"
+                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-emerald-400 text-[11px] font-semibold transition-all">
+                LinkedIn {{ icon('external', 'w-2.5 h-2.5') }}
+              </a>
+            </div>
+          </div>
+
+          {# Team Member 2: Usman Ghani #}
+          <div
+            class="p-7 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-md relative overflow-hidden group hover:border-emerald-500/40 transition-all flex flex-col justify-between">
+            <div
+              class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition-all">
+            </div>
+
+            <div class="space-y-4 relative z-10">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center shrink-0 text-emerald-400 font-bold text-base">
+                  UG
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold text-slate-100 group-hover:text-emerald-400 transition-colors">Usman
+                    Ghani</h3>
+                  <p class="text-[11px] font-semibold text-emerald-500 mt-0.5">Security Operations Analyst</p>
+                </div>
+              </div>
+
+              <div
+                class="inline-block px-2.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-[10px] text-slate-400 font-bold tracking-wider uppercase">
+                SIEM &amp; Defensive Security
+              </div>
+
+              <p class="text-slate-300 text-xs leading-relaxed text-justify">
+                A motivated cybersecurity professional with a strong interest in security operations, threat monitoring,
+                and network security. Skilled in working with SIEM tools, vulnerability assessment, and defensive
+                security practices, with hands-on experience gained through practical projects and continuous learning.
+                Passionate about building secure systems and improving cybersecurity knowledge through real-world
+                exposure and technical problem solving.
+              </p>
+            </div>
+
+            <div class="pt-5 mt-5 border-t border-slate-800/60 flex items-center justify-between relative z-10">
+              <span class="text-[11px] text-slate-500 font-medium">Core Contributor</span>
+              <a href="https://pk.linkedin.com/in/0xusmanghani" target="_blank" rel="noopener noreferrer"
+                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-emerald-400 text-[11px] font-semibold transition-all">
+                LinkedIn {{ icon('external', 'w-2.5 h-2.5') }}
+              </a>
+            </div>
+          </div>
+
+          {# Team Member 3: Abdul Moueed #}
+          <div
+            class="p-7 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-md relative overflow-hidden group hover:border-emerald-500/40 transition-all flex flex-col justify-between">
+            <div
+              class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition-all">
+            </div>
+
+            <div class="space-y-4 relative z-10">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center shrink-0 text-emerald-400 font-bold text-base">
+                  AM
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold text-slate-100 group-hover:text-emerald-400 transition-colors">Abdul
+                    Moueed</h3>
+                  <p class="text-[11px] font-semibold text-emerald-500 mt-0.5">Threat Analyst</p>
+                </div>
+              </div>
+
+              <div
+                class="inline-block px-2.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-[10px] text-slate-400 font-bold tracking-wider uppercase">
+                SOC Operations &amp; Visibility
+              </div>
+
+              <p class="text-slate-300 text-xs leading-relaxed text-justify">
+                A motivated and detail-oriented individual with a strong interest in SOC operations and SEO. Passionate
+                about cybersecurity monitoring, threat analysis, and improving online visibility through effective SEO
+                strategies. Skilled in learning new technologies, analyzing data, and continuously improving technical
+                and analytical abilities through practical experience and research.
+              </p>
+            </div>
+
+            <div class="pt-5 mt-5 border-t border-slate-800/60 flex items-center justify-between relative z-10">
+              <span class="text-[11px] text-slate-500 font-medium">Core Contributor</span>
+              <a href="https://www.linkedin.com/search/results/people/?keywords=Abdul+Moueed" target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-emerald-400 text-[11px] font-semibold transition-all">
+                LinkedIn {{ icon('external', 'w-2.5 h-2.5') }}
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {# Bottom Back to Landing Action #}
+      <div class="pt-4 text-center">
+        <a href="/"
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-medium text-sm transition-all hover:scale-105">
+          {{ icon('arrow-left', 'w-4 h-4') }} Return to Main Home Page
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  {# ── Footer ── #}
+  <footer class="border-t border-slate-800/60 py-8 px-4 mt-auto">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 rounded bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center">
+          {{ icon('shield-check', 'w-3 h-3 text-emerald-400') }}
+        </div>
+        <span class="text-sm font-semibold"><span class="gradient-text">Aid</span><span
+            class="text-slate-400">Ledger</span></span>
+      </div>
+      <p class="text-xs text-slate-600 text-center">A Government of Pakistan Initiative &middot; Secure &amp;
+        Transparent Aid Distribution</p>
+      <div class="flex items-center gap-4 text-xs text-slate-600">
+        <a href="/#how-it-works" class="hover:text-slate-400 transition-colors">How it Works</a>
+        <a href="/about" class="text-emerald-500/80 font-medium hover:text-emerald-400 transition-colors">About Us</a>
+        <a href="/login" class="hover:text-slate-400 transition-colors">Login</a>
+        <a href="/signup" class="hover:text-slate-400 transition-colors">Apply</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    if (menu) menu.classList.toggle('hidden');
+  }
+</script>
+{% endblock %}

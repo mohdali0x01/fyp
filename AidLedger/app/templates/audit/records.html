@@ -1,0 +1,104 @@
+{% extends "admin/_layout.html" %}
+{% set portal_title = "Audit Portal" %}
+{% set portal_color = "purple" %}
+{% set portal_icon  = "eye" %}
+{% block title %}All Records — Audit Portal{% endblock %}
+{% block page_title %}All Records{% endblock %}
+{% block sidebar_nav %}
+<div class="px-3">
+  <p class="text-xs text-slate-600 uppercase tracking-wider font-semibold px-2 mb-2">Audit</p>
+  <a href="/audit" class="sidebar-link">{{ icon('dashboard','w-4 h-4') }} Summary</a>
+  <a href="/audit/records" class="sidebar-link">{{ icon('file','w-4 h-4') }} All Records</a>
+  <a href="/audit/network" class="sidebar-link">{{ icon('network','w-4 h-4') }} Blockchain Network</a>
+</div>
+<div class="px-3 mt-4">
+  <div class="px-2 py-2 rounded-lg bg-purple-500/8 border border-purple-500/15 text-xs notice-text-purple">
+    {{ icon('eye','w-3.5 h-3.5') }} Read-only access.
+  </div>
+</div>
+{% endblock %}
+{% block portal_content %}
+<div class="max-w-6xl mx-auto space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-100">Complete Audit Records</h1>
+      <p class="text-sm text-slate-500 mt-1">Full read-only audit trail — {{ records|length }} records.</p>
+    </div>
+    <span class="px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-xs text-purple-400 inline-flex items-center gap-1.5 shrink-0">
+      {{ icon('eye','w-3.5 h-3.5 shrink-0') }} Read-Only
+    </span>
+  </div>
+  <div class="glass-card p-6">
+    {% if records %}
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs">
+        <thead>
+          <tr class="text-slate-500 border-b border-slate-800/60">
+            <th class="text-left py-2 pr-3 font-medium">Ref.</th>
+            <th class="text-left py-2 pr-3 font-medium">Name</th>
+            <th class="text-left py-2 pr-3 font-medium">CNIC</th>
+            <th class="text-left py-2 pr-3 font-medium">City</th>
+            <th class="text-left py-2 pr-3 font-medium">Pipeline Result</th>
+            <th class="text-left py-2 pr-3 font-medium">Applied</th>
+            <th class="text-left py-2 pr-3 font-medium">Blockchain Hash</th>
+            <th class="text-left py-2 font-medium">Card</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800/30">
+          {% for r in records %}
+          <tr class="hover:bg-slate-800/20 transition-colors">
+            <td class="py-2.5 pr-3 font-mono text-slate-500">AID-{{ '%05d'|format(r.registration_id) }}</td>
+            <td class="py-2.5 pr-3 text-slate-300">{{ r.full_name or '—' }}</td>
+            <td class="py-2.5 pr-3 font-mono text-slate-400">{{ r.cnic }}</td>
+            <td class="py-2.5 pr-3 text-slate-500">{{ r.city or '—' }}</td>
+            <td class="py-2.5 pr-3">
+              {% if r.pipeline_status == 'ELIGIBLE' %}
+                <span class="badge-eligible">Eligible</span>
+              {% elif r.pipeline_status == 'PENDING' %}
+                <span class="badge-pending">Pending</span>
+              {% else %}
+                <span class="badge-failed">{{ r.pipeline_status|replace('_',' ')|title }}</span>
+              {% endif %}
+            </td>
+            <td class="py-2.5 pr-3 text-slate-500">
+              {% if r.created_at %}{{ r.created_at.strftime('%d %b %Y') }}{% else %}—{% endif %}
+            </td>
+            <td class="py-2.5 pr-3">
+              {% if r.eligible and r.eligible.blockchain_approval_hash %}
+              <div class="flex items-center gap-1.5">
+                <code class="font-mono text-emerald-400/80 max-w-[110px] truncate inline-block" title="{{ r.eligible.blockchain_approval_hash }}">
+                  {{ r.eligible.blockchain_approval_hash[:10] }}…
+                </code>
+                <button
+                  onclick="copyToClipboard('{{ r.eligible.blockchain_approval_hash }}', this)"
+                  class="p-1 rounded hover:bg-slate-700/60 text-slate-600 hover:text-slate-400 transition-colors"
+                  title="Copy full hash">
+                  {{ icon('copy','w-3 h-3') }}
+                </button>
+              </div>
+              {% else %}
+              <span class="text-slate-700">—</span>
+              {% endif %}
+            </td>
+            <td class="py-2.5">
+              {% if r.card_issue %}
+                <span class="text-emerald-400">{{ icon('check','w-3 h-3') }} Issued</span>
+              {% else %}
+                <span class="text-slate-600">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="text-sm text-slate-500 text-center py-8">No records found.</p>
+    {% endif %}
+  </div>
+  <div class="p-4 rounded-xl border border-purple-500/20 bg-purple-500/5 text-xs notice-text-purple flex items-start gap-2">
+    {{ icon('alert','w-4 h-4 shrink-0 mt-0.5') }}
+    Read-only audit portal. No modifications possible. Blockchain hashes can be independently verified on the network.
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "admin/_layout.html" %}
+{% set portal_title = "SBP Portal" %}
+{% set portal_color = "blue" %}
+{% set portal_icon  = "layers" %}
+{% block title %}City Breakdown — SBP Portal{% endblock %}
+{% block page_title %}City Breakdown{% endblock %}
+{% block sidebar_nav %}
+<div class="px-3">
+  <p class="text-xs text-slate-600 uppercase tracking-wider font-semibold px-2 mb-2">Financial</p>
+  <a href="/sbp" class="sidebar-link">{{ icon('dashboard','w-4 h-4') }} Overview</a>
+  <a href="/sbp/city-breakdown" class="sidebar-link">{{ icon('send','w-4 h-4') }} City Breakdown</a>
+</div>
+{% endblock %}
+{% block portal_content %}
+<div class="max-w-5xl mx-auto space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-100">City Breakdown</h1>
+    <p class="text-sm text-slate-500 mt-1">Number of approved beneficiaries per city — for disbursement planning.</p>
+  </div>
+  <div class="glass-card p-6">
+    <h2 class="font-semibold text-slate-200 mb-5 flex items-center gap-2">
+      {{ icon('send','w-4 h-4 text-blue-400') }} Eligible Applicants by City
+    </h2>
+    {% if city_breakdown %}
+    <div class="space-y-4">
+      {% set max_val = city_breakdown[0][1] %}
+      {% for city, count in city_breakdown %}
+      <div class="flex items-center gap-4">
+        <div class="w-28 text-sm text-slate-400 truncate shrink-0">{{ city }}</div>
+        <div class="flex-1 bg-slate-800/60 rounded-full h-2.5">
+          <div class="bg-blue-500 h-2.5 rounded-full transition-all" style="width: {{ (count / max_val * 100)|round(0) }}%"></div>
+        </div>
+        <div class="w-12 text-right text-sm font-semibold text-slate-300 shrink-0">{{ count }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="mt-6 pt-4 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-500">
+      <span>Total cities: {{ city_breakdown|length }}</span>
+      <span>Total approved: {{ city_breakdown|sum(attribute=1) }}</span>
+    </div>
+    {% else %}
+    <p class="text-sm text-slate-500 text-center py-6">No eligibility data yet.</p>
+    {% endif %}
+  </div>
+  <div class="p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 text-xs notice-text flex items-start gap-2">
+    {{ icon('alert','w-4 h-4 shrink-0 mt-0.5') }}
+    Aggregated view only. Individual citizen details are not accessible from this portal.
+  </div>
+</div>
+{% endblock %}

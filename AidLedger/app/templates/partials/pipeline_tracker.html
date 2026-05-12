@@ -1,0 +1,118 @@
+{# partials/pipeline_tracker.html
+   Usage: {% include "partials/pipeline_tracker.html" %}
+   Requires: registration object with .pipeline_status
+#}
+{% set status = registration.pipeline_status if registration else 'PENDING' %}
+
+{% set kyc_done   = status in ['FAMILY_INELIGIBLE','PMT_FAILED','ELIGIBLE'] %}
+{% set kyc_failed = status == 'KYC_FAILED' %}
+{% set fam_done   = status in ['PMT_FAILED','ELIGIBLE'] %}
+{% set fam_failed = status == 'FAMILY_INELIGIBLE' %}
+{% set pmt_done   = status == 'ELIGIBLE' %}
+{% set pmt_failed = status == 'PMT_FAILED' %}
+{% set chain_done = status == 'ELIGIBLE' %}
+{% set card_done  = registration.card_issue and registration.card_issue.card_status == 'ACTIVE' %}
+
+{# ─────────────────────────────────────────────────────────────────────────
+   Macro: one pipeline row
+   Args: num, en_label, ur_label, is_done, is_failed, is_active, status_en, status_ur
+───────────────────────────────────────────────────────────────────────── #}
+{% macro stage(num, en_label, ur_label, is_done, is_failed, is_active, status_en, status_ur) %}
+<div class="flex items-start gap-3">
+  {# Number dot #}
+  <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold mt-0.5
+    {% if is_done %}chain-dot-active text-slate-900
+    {% elif is_failed %}chain-dot-failed text-white
+    {% elif is_active %}chain-dot-pending text-slate-900
+    {% else %}chain-dot-inactive text-slate-500{% endif %}">
+    {% if is_done %}✓{% elif is_failed %}✗{% else %}{{ num }}{% endif %}
+  </div>
+
+  {# Stage details #}
+  <div class="flex-1 min-w-0">
+    {# English name left — Urdu name right — Status badge far right #}
+    <div class="flex items-start justify-between gap-2">
+      <div class="flex-1 min-w-0">
+        <span class="text-sm font-medium
+          {% if is_done %}text-emerald-400
+          {% elif is_failed %}text-red-400
+          {% elif is_active %}text-amber-400
+          {% else %}text-slate-500{% endif %}">
+          {{ en_label }}
+        </span>
+        <span class="urdu-xs ml-2
+          {% if is_done %}text-emerald-500/70
+          {% elif is_failed %}text-red-400/70
+          {% elif is_active %}text-amber-400/70
+          {% else %}text-slate-600{% endif %}">
+          {{ ur_label }}
+        </span>
+      </div>
+      {# Status pill #}
+      <div class="shrink-0 text-right">
+        <span class="text-xs font-medium
+          {% if is_done %}text-emerald-500
+          {% elif is_failed %}text-red-500
+          {% elif is_active %}text-amber-500
+          {% else %}text-slate-600{% endif %}">
+          {{ status_en }}
+        </span>
+        <div class="urdu-xs block
+          {% if is_done %}text-emerald-600
+          {% elif is_failed %}text-red-600
+          {% elif is_active %}text-amber-600
+          {% else %}text-slate-700{% endif %}">
+          {{ status_ur }}
+        </div>
+      </div>
+    </div>
+
+    {# Progress bar #}
+    <div class="h-1 rounded-full mt-2
+      {% if is_done %}bg-emerald-500/25
+      {% elif is_failed %}bg-red-500/25
+      {% elif is_active %}bg-amber-500/25
+      {% else %}bg-slate-800{% endif %}">
+      {% if is_done %}
+        <div class="h-full rounded-full w-full bg-emerald-500"></div>
+      {% elif is_failed %}
+        <div class="h-full rounded-full w-full bg-red-500"></div>
+      {% elif is_active %}
+        <div class="h-full rounded-full w-1/2 bg-amber-500 animate-pulse"></div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+<div class="space-y-4">
+  {{ stage(1,
+     'Identity Verification',     'شناخت کی تصدیق',
+     kyc_done, kyc_failed, false,
+     ('Passed' if kyc_done else ('Failed' if kyc_failed else 'Pending')),
+     ('کامیاب' if kyc_done else ('ناکام' if kyc_failed else 'جاری ہے'))) }}
+
+  {{ stage(2,
+     'Family Check',              'خاندانی جائزہ',
+     fam_done, fam_failed, kyc_done and not fam_done and not fam_failed,
+     ('Passed' if fam_done else ('Failed' if fam_failed else ('Running' if kyc_done else 'Waiting'))),
+     ('کامیاب' if fam_done else ('ناکام' if fam_failed else ('چیک ہو رہا ہے' if kyc_done else 'انتظار')))) }}
+
+  {{ stage(3,
+     'Financial Assessment',      'مالی جائزہ',
+     pmt_done, pmt_failed, fam_done and not pmt_done and not pmt_failed,
+     ('Passed' if pmt_done else ('Failed' if pmt_failed else ('Running' if fam_done else 'Waiting'))),
+     ('کامیاب' if pmt_done else ('ناکام' if pmt_failed else ('جائزہ جاری' if fam_done else 'انتظار')))) }}
+
+  {{ stage(4,
+     'Decision Recorded',         'فیصلہ محفوظ',
+     chain_done, false, pmt_done and not chain_done,
+     ('Recorded' if chain_done else 'Waiting'),
+     ('محفوظ ہو گیا' if chain_done else 'انتظار')) }}
+
+  {{ stage(5,
+     'Card Issuance',             'کارڈ جاری کرنا',
+     card_done, false, chain_done and not card_done,
+     ('Issued' if card_done else ('Pending Bank' if chain_done else 'Waiting')),
+     ('جاری ہو گیا' if card_done else ('بینک کے پاس' if chain_done else 'انتظار'))) }}
+</div>

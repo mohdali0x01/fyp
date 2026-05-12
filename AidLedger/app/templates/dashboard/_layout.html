@@ -1,0 +1,104 @@
+{# dashboard/_layout.html — Beneficiary portal shell #}
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+
+{% block body %}
+<div class="min-h-screen flex bg-slate-950">
+
+  {# Mobile overlay #}
+  <div id="sidebar-overlay" class="hidden fixed inset-0 bg-slate-950/70 z-30 lg:hidden" onclick="toggleSidebar()"></div>
+
+  {# ── Sidebar ── #}
+  <aside id="sidebar" class="sidebar -translate-x-full lg:translate-x-0" aria-label="Navigation">
+    {# Brand #}
+    <div class="h-16 flex items-center px-4 border-b border-slate-800/60">
+      <a href="/" class="flex items-center gap-2 group">
+        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center group-hover:bg-emerald-500/20 transition-all">
+          {{ icon('shield-check', 'w-4 h-4 text-emerald-400') }}
+        </div>
+        <span class="font-bold text-base">
+          <span class="gradient-text">Aid</span><span class="text-slate-300">Ledger</span>
+        </span>
+      </a>
+    </div>
+
+    {# Nav #}
+    <nav class="flex-1 py-4 overflow-y-auto">
+      <div class="px-3">
+        <p class="text-xs text-slate-600 uppercase tracking-wider font-semibold px-2 mb-2">My Application</p>
+        <a href="/dashboard" class="sidebar-link">
+          {{ icon('dashboard', 'w-4 h-4') }} Overview
+        </a>
+        <a href="/dashboard/apply" class="sidebar-link">
+          {{ icon('file', 'w-4 h-4') }} Apply for Aid
+        </a>
+        <a href="/dashboard/status" class="sidebar-link">
+          {{ icon('check-circle', 'w-4 h-4') }} My Status
+        </a>
+        <a href="/dashboard/notifications" class="sidebar-link">
+          {{ icon('bell', 'w-4 h-4') }} Notifications
+        </a>
+        <a href="/dashboard/card" class="sidebar-link">
+          {{ icon('card', 'w-4 h-4') }} My Aid Card
+        </a>
+      </div>
+    </nav>
+
+    {# User footer #}
+    <div class="p-4 border-t border-slate-800/60">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-8 h-8 rounded-full bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center">
+          <span class="text-emerald-400 text-xs font-bold">{{ (registration.full_name if registration and registration.full_name else username)[0]|upper if username else 'U' }}</span>
+        </div>
+        <div class="min-w-0">
+          <p class="text-sm font-medium text-slate-300 truncate">{{ registration.full_name if registration and registration.full_name else username }}</p>
+          <p class="text-xs text-emerald-500/70">Aid Applicant</p>
+        </div>
+      </div>
+      <form action="/logout" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+        <button type="submit" class="sidebar-link w-full text-red-400/70 hover:text-red-400 hover:bg-red-500/5">
+          {{ icon('logout', 'w-4 h-4') }} Sign Out
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  {# ── Main ── #}
+  <div class="flex-1 flex flex-col min-w-0 lg:ml-64 main-content">
+
+    {# Topbar #}
+    <header class="fixed top-0 right-0 left-0 lg:left-64 z-20 flex items-center justify-between h-16 px-4 sm:px-6 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/60">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all" aria-label="Toggle Sidebar">
+          {{ icon('menu', 'w-5 h-5') }}
+        </button>
+        <h2 class="text-sm font-semibold text-slate-300 hidden sm:block">{% block page_title %}Overview{% endblock %}</h2>
+      </div>
+      <div class="flex items-center gap-4">
+        {# Theme toggle #}
+        <button onclick="toggleTheme()" class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-800/50 transition-all" aria-label="Toggle Theme">
+          <span class="theme-icon-dark">{{ m.icon_moon('w-4 h-4') }}</span>
+          <span class="theme-icon-light hidden">{{ m.icon_sun('w-4 h-4') }}</span>
+        </button>
+        {# Simple greeting #}
+        <div class="hidden sm:flex items-center gap-2 border-l border-slate-700/50 pl-4">
+          <span class="text-xs text-slate-600">
+            {% set hour = now_hour if now_hour is defined else 12 %}
+            Welcome, {{ registration.full_name.split()[0] if registration and registration.full_name else username }}
+          </span>
+          <div class="w-7 h-7 rounded-full bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center">
+            <span class="text-emerald-400 text-xs font-bold">{{ (registration.full_name if registration and registration.full_name else username)[0]|upper if username else 'U' }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 px-4 sm:px-6 lg:px-8 pb-8 pt-24 overflow-y-auto">
+      {% block dashboard_content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+{% block extra_scripts %}{% endblock %}
+{% endblock %}

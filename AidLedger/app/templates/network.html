@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+
+{% block title %}Blockchain Network{% endblock %}
+{% block meta_description %}View the AidLedger Hyperledger Besu blockchain network status — live block height, peers, and contract details.{% endblock %}
+
+{% block body %}
+<div class="hero-gradient grid-bg min-h-screen flex flex-col">
+
+  {# Navbar #}
+  <nav class="fixed top-0 left-0 right-0 z-50 border-b border-slate-800/60 backdrop-blur-xl bg-slate-950/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="/" class="flex items-center gap-2 group">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center group-hover:bg-emerald-500/20 transition-all">
+            {{ icon('shield-check','w-4 h-4 text-emerald-400') }}
+          </div>
+          <span class="font-bold text-lg"><span class="gradient-text">Aid</span><span class="text-slate-200">Ledger</span></span>
+        </a>
+        <div class="flex items-center gap-4">
+          <a href="/" class="text-sm text-slate-400 hover:text-slate-200 transition-colors">Home</a>
+          {% if is_authenticated %}
+            <a href="/dashboard" class="text-sm px-4 py-2 rounded-lg border border-slate-700 hover:border-emerald-500/40 text-slate-300 hover:text-slate-100 font-medium transition-all">Dashboard</a>
+          {% else %}
+            <a href="/login" class="text-sm text-slate-400 hover:text-slate-200 transition-colors">Login</a>
+            <a href="/signup" class="text-sm px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold transition-all">Apply</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-1 pt-24 pb-12 px-4">
+    <div class="max-w-5xl mx-auto">
+
+      {# Header #}
+      <div class="text-center mb-12 animate-slide-up">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 text-xs font-medium mb-4">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          Live Network Status
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold text-slate-100 mb-3">Hyperledger Besu Network</h1>
+        <p class="text-slate-500 max-w-xl mx-auto">
+          A 4-node permissioned blockchain running the AidLedger GRC contracts.
+          Chain ID: <code class="text-emerald-400 font-mono">1337</code>
+        </p>
+      </div>
+
+      {# Live stats — HTMX auto-refresh every 10s #}
+      <div class="glass-card p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-slate-200 flex items-center gap-2">
+            {{ icon('cpu','w-4 h-4 text-emerald-400') }} Live Network Stats
+          </h2>
+          <span class="text-xs text-slate-600 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            Auto-refreshing every 10s
+          </span>
+        </div>
+        <div id="network-stats"
+             hx-get="/htmx/network-stats"
+             hx-trigger="load, every 10s"
+             hx-swap="innerHTML">
+          <div class="flex items-center gap-2 text-slate-500 text-sm">
+            <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            Connecting to node...
+          </div>
+        </div>
+      </div>
+
+      {# Contract addresses #}
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+
+        {# AidLedgerGov #}
+        <div class="glass-card p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center">
+              {{ icon('shield','w-5 h-5 text-emerald-400') }}
+            </div>
+            <div>
+              <h3 class="font-semibold text-slate-200">AidLedgerGov</h3>
+              <p class="text-xs text-slate-500">Governance &amp; Policy Contract</p>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="p-2.5 bg-slate-800/60 rounded-lg">
+              <p class="text-xs text-slate-500 mb-1">Contract Address</p>
+              <div class="flex items-center gap-2">
+                <code class="text-xs text-emerald-400 font-mono break-all flex-1">0x42699A7612A82f1d9C36148af9C77354759b210b</code>
+                <button id="copy-gov-btn"
+                  onclick="copyToClipboard('0x42699A7612A82f1d9C36148af9C77354759b210b','copy-gov-btn')"
+                  class="shrink-0 p-1 text-slate-600 hover:text-slate-300 transition-colors">
+                  {{ icon('copy','w-3.5 h-3.5') }}
+                </button>
+              </div>
+            </div>
+            <div class="text-xs text-slate-600 space-y-1 pt-1">
+              <p class="flex items-center gap-1.5">{{ icon('check','w-3 h-3 text-emerald-500') }} Urban PMT limit: ≤ 38.00</p>
+              <p class="flex items-center gap-1.5">{{ icon('check','w-3 h-3 text-emerald-500') }} Rural PMT limit: ≤ 32.00</p>
+              <p class="flex items-center gap-1.5">{{ icon('check','w-3 h-3 text-emerald-500') }} Quarterly cap: PKR 25,000</p>
+              <p class="flex items-center gap-1.5">{{ icon('check','w-3 h-3 text-emerald-500') }} Monthly aid: PKR 8,000</p>
+            </div>
+          </div>
+        </div>
+
+        {# AidRegistry #}
+        <div class="glass-card p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center">
+              {{ icon('database','w-5 h-5 text-blue-400') }}
+            </div>
+            <div>
+              <h3 class="font-semibold text-slate-200">AidRegistry</h3>
+              <p class="text-xs text-slate-500">Eligibility Registry Contract</p>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="p-2.5 bg-slate-800/60 rounded-lg">
+              <p class="text-xs text-slate-500 mb-1">Contract Address</p>
+              <div class="flex items-center gap-2">
+                <code class="text-xs text-blue-400 font-mono break-all flex-1">0xa50a51c09a5c451C52BB714527E1974b686D8e77</code>
+                <button id="copy-reg-btn"
+                  onclick="copyToClipboard('0xa50a51c09a5c451C52BB714527E1974b686D8e77','copy-reg-btn')"
+                  class="shrink-0 p-1 text-slate-600 hover:text-slate-300 transition-colors">
+                  {{ icon('copy','w-3.5 h-3.5') }}
+                </button>
+              </div>
+            </div>
+            <div class="text-xs text-slate-600 space-y-1 pt-1">
+              <p class="flex items-center gap-1.5">{{ icon('check','w-3 h-3 text-emerald-500') }} Stores eligibility per CNIC</p>
+              <p class="flex items-center gap-1.5">{{ icon('check','w-3 h-3 text-emerald-500') }} Roles: SBP_ROLE, AIDLEDGER_ROLE</p>
+              <p class="flex items-center gap-1.5">{{ icon('check','w-3 h-3 text-emerald-500') }} Emits ApplicationLogged events</p>
+              <p class="flex items-center gap-1.5">{{ icon('check','w-3 h-3 text-emerald-500') }} Immutable approval hashes</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# Network nodes #}
+      <div class="glass-card p-6">
+        <h2 class="font-semibold text-slate-200 mb-4 flex items-center gap-2">
+          {{ icon('network','w-4 h-4 text-slate-400') }} Network Topology
+        </h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {% for i in range(1, 5) %}
+          <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-700/40 text-center">
+            <div class="w-8 h-8 rounded-full chain-dot-active flex items-center justify-center mx-auto mb-2">
+              <span class="text-xs font-bold text-slate-900">{{ i }}</span>
+            </div>
+            <p class="text-xs font-medium text-slate-300">Node {{ i }}</p>
+            <p class="text-xs text-slate-600 mt-0.5">
+              {% if i == 1 %}Bootnode{% elif i == 2 %}Validator{% elif i == 3 %}RPC{% else %}Archive{% endif %}
+            </p>
+            <p class="text-xs text-emerald-500 mt-1">● Online</p>
+          </div>
+          {% endfor %}
+        </div>
+        <p class="text-xs text-slate-600 mt-4 text-center">
+          QBFT Consensus · Chain ID 1337 · Block Time ~1s
+        </p>
+      </div>
+
+    </div>
+  </main>
+</div>
+{% endblock %}

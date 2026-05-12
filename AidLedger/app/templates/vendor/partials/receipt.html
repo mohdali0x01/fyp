@@ -1,0 +1,59 @@
+{# vendor/partials/receipt.html — Shown after successful blockchain transaction #}
+<div class="space-y-4 text-center">
+
+  {# Success animation #}
+  <div class="py-6">
+    <div class="w-20 h-20 rounded-full bg-emerald-500/15 border-2 border-emerald-500/40 flex items-center justify-center mx-auto mb-4 animate-pulse">
+      <svg class="w-10 h-10 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+    </div>
+    <h3 class="text-xl font-bold text-emerald-500">Payment Successful!</h3>
+    <p class="text-muted text-sm mt-1">Transaction recorded on blockchain</p>
+  </div>
+
+  {# Transaction Summary #}
+  <div class="bg-slate-900/60 rounded-2xl p-4 space-y-3 text-left">
+    <div class="flex justify-between items-center">
+      <span class="text-xs text-muted">Customer</span>
+      <span class="text-sm font-semibold text-secondary">{{ cardholder }}</span>
+    </div>
+    <div class="flex justify-between items-center">
+      <span class="text-xs text-muted">Amount Charged</span>
+      <span class="text-lg font-bold text-emerald-500">PKR {{ "{:,}".format(amount) }}</span>
+    </div>
+    <div class="border-t border-slate-800/20 pt-3">
+      <p class="text-xs text-muted mb-1">Blockchain TX Hash</p>
+      <div class="flex items-center gap-2">
+        <code class="text-xs text-emerald-400/80 font-mono truncate flex-1">{{ tx_hash }}</code>
+        <button
+          onclick="navigator.clipboard.writeText('{{ tx_hash }}')"
+          class="p-1 rounded hover:bg-slate-700 text-slate-600 hover:text-slate-300 transition-colors shrink-0"
+          title="Copy hash"
+        >
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-3 rounded-xl bg-slate-500/10 text-xs text-muted flex items-center gap-2">
+    <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>
+    </svg>
+    This transaction is immutably recorded on the Hyperledger Besu blockchain.
+  </div>
+
+  <button
+    onclick="location.reload()"
+    class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold text-sm transition-all flex items-center justify-center gap-2"
+  >
+    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+    </svg>
+    New Transaction
+  </button>
+</div>
