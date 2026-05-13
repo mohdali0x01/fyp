@@ -147,4 +147,11 @@ python vendor_app.py
 Developed as a definitive capstone project solution addressing structural socio-economic governance challenges. All related documents, defense slide decks, and milestone architectural blueprints are publicly available in the **`Documentation/`** parent repository.
 
 ---
-*Built with ❤️ for fully transparent, reliable, and equitable decentralized aid allocation.*
+
+## ⚖️ License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+**AidLedger** — Enterprise Blockchain Integration for Transparent Humanitarian Aid Allocation.
