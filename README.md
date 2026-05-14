@@ -17,7 +17,7 @@ AidLedger bridges the ultimate gap between central monetary authorities (such as
 * 🔐 **Decentralized RBAC Governance**: Strict segregation of duties enforcing custom authorization protocols across distinct ecosystem personas (Beneficiaries, Bank Personnel, Third-Party Auditors, and SBP Administrators). One role cannot execute or mutate the core state parameters of another.
 * ⚡ **Lightweight Python MVC Architecture**: Seamless integration using a modular Python Flask application powered by **Prisma ORM** for real-time relational persistence, paired with **HTMX** for dynamic, SPA-like frontend speed without heavy frontend bundles.
 * ⛓️ **Consensus-Driven Audit Trails**: Native connection to local Besu Quorum nodes running EVM smart contracts (`AidLedgerGov.sol`, `AidRegistry.sol`) allowing immediate transparent verification on custom network dashboards and block explorers.
-* 📱 **Real-Time Live SMS Validation**: Fully integrated two-factor authentication loop leveraging Twilio OTP SMS microservices to instantly verify user registration events and authorize merchant payouts directly at POS terminals.
+* 📱 **Real-Time Live SMS Validation**: Fully integrated authentication loop leveraging custom real-time OTP SMS microservices to instantly verify user registration events and authorize merchant payouts directly at POS terminals.
 * 🏪 **Merchant POS Platform**: Distinct web portal dedicated entirely to verified local vendors/merchants (`vendor_app.py`), allowing seamless redemption of conditional aid tokens for transparent inventory receipts.
 * 📊 **Targeted UI Viewports**: Advanced contextual privacy where complex under-the-hood blockchain consensus graphs are shielded from standard users, presenting specific macro-metrics explicitly to banking overseers and regulatory auditors.
 
@@ -38,7 +38,7 @@ AidLedger bridges the ultimate gap between central monetary authorities (such as
                                 │
    ┌────────────────────────────▼────────────────────────────┐
    │             PERSISTENCE & NOTIFICATION LAYER            │
-   │     Python Prisma ORM Engine  │  Twilio SMS Gateway     │
+   │    Python Prisma ORM Engine  │  Live OTP Microservice   │
    └────────────────────────────┬────────────────────────────┘
                                 │
    ┌────────────────────────────▼────────────────────────────┐
@@ -65,7 +65,7 @@ AidLedger bridges the ultimate gap between central monetary authorities (such as
 │   │   ├── middleware/         # Security Hooks and RBAC Session Validation
 │   │   ├── models/             # Schema Logic and Database Hooks
 │   │   ├── routes/             # Blueprint Registrations
-│   │   ├── services/           # External APIs (Blockchain EVM, Twilio OTP)
+│   │   ├── services/           # External APIs (Blockchain EVM, OTP microservices)
 │   │   ├── static/             # Vanilla Premium CSS and HTMX Utility Scripts
 │   │   └── templates/          # Contextual Jinja2 Viewports (Admin, Audit, SBP, Vendor)
 │   ├── prisma/                 # Relational Database Schema & Client Generator
@@ -99,20 +99,27 @@ Streamlined Point-of-Sale interface validating external user SMS OTP tokens to r
 ## 🚀 Local Development Setup Guide
 
 ### Prerequisites
-* **Docker Desktop** running locally (for Besu network configuration and Postgres container hosting).
+* **Docker Desktop** running locally.
 * **Python 3.10+** installed natively.
 
-### Step 1: Initialize the Enterprise Database
-Restore the complete application database state directly from our preserved database snapshot:
+### Step 1: Spin up the Permissioned Blockchain Network
+Before launching any portal interfaces, initialize the containerized Quorum execution environment to establish your active block consensus and validation containers:
 ```bash
-# Verify app-postgres container is operational via docker-compose up inside Besu environment
+cd Besu/quorum-test-network
+./run.sh
+```
+*(Alternatively, execute `docker compose up -d` within the directory to run natively in detached mode).*
+
+### Step 2: Initialize the Enterprise Database
+With your core blockchain engine active, populate your application database state using our pre-packaged snapshot:
+```bash
 docker exec -i app-postgres psql -U appuser -d appdb < Data/appdb_backup.sql
 ```
 
-### Step 2: Configure the Python Application Environment
-Navigate into the core server directory and prepare standard virtual environments:
+### Step 3: Configure the Python Application Environment
+Navigate back into the primary application directory and provision your Prisma runtime hooks:
 ```bash
-cd AidLedger
+cd ../../AidLedger
 python -m venv venv
 
 # Activate Virtual Environment (Windows)
@@ -125,7 +132,7 @@ pip install -r requirements.txt
 prisma generate
 ```
 
-### Step 3: Launch Local Web Servers
+### Step 4: Launch Local Web Servers
 AidLedger operates distinct optimized server instances supporting separate enterprise workflows:
 
 **Launch Core Regulatory & User Dashboard Portal:**
